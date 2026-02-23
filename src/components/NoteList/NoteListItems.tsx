@@ -1,23 +1,20 @@
 import { useState, useEffect } from "react";
 import { fetchNotes, type Notes } from "../../api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-interface NoteListItemsProps {
-  selectedFolderId: string;
-  setSelectedFolderId: React.Dispatch<React.SetStateAction<string>>;
-}
-export default function NotesListItems({
-  selectedFolderId,
-}: NoteListItemsProps) {
+export default function NotesListItems() {
   const [notes, setNotes] = useState<Notes[]>([]);
   const navigate = useNavigate();
+  const { folderId } = useParams<{ folderId: string }>();
 
   useEffect(() => {
-    fetchNotes(selectedFolderId).then((data) => {
-      setNotes(data);
-      console.log(data);
-    });
-  }, [selectedFolderId]);
+    if (folderId) {
+      fetchNotes(folderId).then((data) => {
+        setNotes(data);
+        console.log(data);
+      });
+    }
+  }, [folderId]);
 
   return (
     <div className="notesItems">
@@ -25,9 +22,7 @@ export default function NotesListItems({
         return (
           <div
             className="noteItem active"
-            onClick={() =>
-              navigate(`/folders/${selectedFolderId}/notes/${note.id}`)
-            }
+            onClick={() => navigate(`/folders/${folderId}/notes/${note.id}`)}
           >
             <div className="noteItemTitle">{note.title}</div>
             <div className="noteItemPreview">{note.preview}</div>

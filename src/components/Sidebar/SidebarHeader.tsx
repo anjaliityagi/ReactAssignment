@@ -1,24 +1,20 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { createNote, fetchNotes } from "../../api";
 
-interface SidebarHeaderProps {
-  selectedFolderId: string;
-  setSelectedFolderId: React.Dispatch<React.SetStateAction<string>>;
-}
-export default function SidebarHeader({
-  selectedFolderId,
-  setSelectedFolderId,
-}: SidebarHeaderProps) {
+import { createNote, fetchNotes } from "../../api";
+import { useNavigate, useParams } from "react-router-dom";
+
+export default function SidebarHeader() {
   const [showSearch, setShowSearch] = useState(false);
   const navigate = useNavigate();
+  const { folderId } = useParams<{ folderId: string }>();
 
   const handleCreateNote = async () => {
-    if (!selectedFolderId) return;
-
-    const newNote = await createNote(selectedFolderId);
-
-    navigate(`/folders/${selectedFolderId}/notes/${newNote.folderId}`);
+    if (folderId) {
+      const newNote = await createNote(folderId, "", "", false, true);
+      console.log("folderid", folderId);
+      console.log("newnoteid", newNote);
+      navigate(`/folders/${folderId}/notes/${newNote}`);
+    }
   };
 
   return (
@@ -48,12 +44,8 @@ export default function SidebarHeader({
           />
         </div>
       ) : (
-        <button className="sidebarNewNoteBtn">
-          <img
-            src="/src/assets/AddNoteIcon.svg"
-            alt="addNote"
-            onClick={handleCreateNote}
-          />{" "}
+        <button className="sidebarNewNoteBtn" onClick={handleCreateNote}>
+          <img src="/src/assets/AddNoteIcon.svg" alt="addNote" />
           New Note
         </button>
       )}

@@ -1,43 +1,45 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, useOutletContext } from "react-router-dom";
-import type { Notes } from "../../../api";
-import { updateNote, fetchNotes } from "../../../api";
+import { useParams } from "react-router-dom";
+import type { Note } from "../../../api";
+import { updateNote, fetchNoteById } from "../../../api";
 
-type OutletContextType = { selectedFolderId: string };
+//type OutletContextType = { selectedFolderId: string };
 
 export default function NoteView() {
-  const { selectedFolderId } = useOutletContext<OutletContextType>();
+  //   const { selectedFolderId } = useOutletContext<OutletContextType>();
   const { noteId } = useParams<{ noteId: string }>();
+  console.log("noteId", noteId);
 
-  const [note, setNote] = useState<Notes | null>(null);
+  const [note, setNote] = useState<Note | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [saving, setSaving] = useState(false);
+  //   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     async function loadNote() {
-      if (!noteId || !selectedFolderId) return;
+      if (!noteId) return;
+      console.log("noteId", noteId);
       try {
-        const notes = await fetchNotes(selectedFolderId);
-        const foundNote = notes.find((n) => n.id === noteId);
-        setNote(foundNote ?? null);
-        setTitle(foundNote?.title ?? "");
-        setContent(foundNote?.preview ?? "");
+        const note = await fetchNoteById(noteId);
+        setNote(note);
+        setTitle(note?.title ?? "");
+        setContent(note?.content ?? "");
       } catch (err) {
         console.error("Failed to load note:", err);
         setNote(null);
       }
     }
     loadNote();
-  }, [noteId, selectedFolderId]);
+  }, [noteId]);
 
   const autoSave = useCallback(
     debounce((t: string, c: string) => {
       if (!note) return;
-      setSaving(true);
-      updateNote(note.id, { title: t, content: c }).finally(() =>
-        setSaving(false),
-      );
+      //   setSaving(true);
+      if (noteId) {
+        updateNote(noteId, { title: t, content: c });
+        // setSaving(false);
+      }
     }, 500),
     [note],
   );
@@ -67,11 +69,11 @@ export default function NoteView() {
         onChange={handleContentChange}
         placeholder="Start typing..."
       />
-      <div className="noteMeta">
+      {/* <div className="noteMeta">
         <div>Created: {note.createdAt}</div>
         <div>Updated: {note.updatedAt}</div>
         {saving && <div style={{ color: "blue" }}>Saving...</div>}
-      </div>
+      </div> */}
     </div>
   );
 }

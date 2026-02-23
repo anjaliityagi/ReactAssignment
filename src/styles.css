@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap");
+
 body {
   margin: 0;
   background: #0f0f10;
@@ -130,6 +131,7 @@ body {
 
 .noteDetail {
   background: #0f0f10;
+  flex: 1;
 }
 
 .notesListContainer {
@@ -203,6 +205,7 @@ body {
 .noteDetailContainer {
   padding: 20px;
   height: 100%;
+
   display: flex;
   flex-direction: column;
 }

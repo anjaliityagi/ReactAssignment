@@ -71,9 +71,21 @@ export const fetchNotes = async (id: string): Promise<Notes[]> => {
   return res.data.notes;
 };
 
-export const createNote = async (folderId: string): Promise<Note> => {
-  const res = await api.post("/notes", { folderId });
-  return res.data.notes;
+export const createNote = async (
+  folderId: string,
+  title: string,
+  content: string,
+  isArchived: false,
+  isFavorite: true,
+): Promise<Note> => {
+  const res = await api.post("/notes", {
+    folderId,
+    title,
+    content,
+    isArchived,
+    isFavorite,
+  });
+  return res.data.id;
 };
 
 // api.ts
@@ -83,7 +95,7 @@ export const updateNote = async (
 ) => {
   try {
     const res = await api.patch(`/notes/${id}`, data);
-    return res.data.note; // or whatever the API returns
+    return res.data.note;
   } catch (error) {
     console.error("Failed to update note:", error);
     throw error;

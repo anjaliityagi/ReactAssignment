@@ -5,26 +5,20 @@ import NoteListItems from "./components/NoteList/NoteListItems";
 import { Outlet } from "react-router-dom";
 
 export default function App() {
-  const [selectedFolderId, setSelectedFolderId] = useState("");
+  // const [selectedFolderId, setSelectedFolderId] = useState("");
 
   return (
     <div className="app">
       <div className="sidebar">
-        <Sidebar
-          selectedFolderId={selectedFolderId}
-          setSelectedFolderId={setSelectedFolderId}
-        />
+        <Sidebar />
       </div>
 
       <div className="notesList">
-        <NoteListItems
-          selectedFolderId={selectedFolderId}
-          setSelectedFolderId={setSelectedFolderId}
-        />
+        <NoteListItems />
       </div>
 
       <div className="noteDetail">
-        <Outlet context={{ selectedFolderId }} />
+        <Outlet />
       </div>
     </div>
   );

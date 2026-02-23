@@ -17,16 +17,16 @@ export default function NotesListItems() {
   }, [folderId]);
 
   return (
-    <div className="notesItems">
+    <div className="flex flex-col gap-[10px]">
       {notes.map((note) => {
         return (
           <div
-            className="noteItem active"
+            className="p-3 rounded-lg cursor-pointer bg-transparent hover:bg-surface transition "
             onClick={() => navigate(`/folders/${folderId}/notes/${note.id}`)}
           >
-            <div className="noteItemTitle">{note.title}</div>
-            <div className="noteItemPreview">{note.preview}</div>
-            <div className="noteItemDate">{note.createdAt}</div>
+            <div className="font-medium mb-1">{note.title}</div>
+            <div className="text-[13px] text-gray-400 mb-1">{note.preview}</div>
+            <div className="text-xs text-gray-500">{note.createdAt}</div>
           </div>
         );
       })}

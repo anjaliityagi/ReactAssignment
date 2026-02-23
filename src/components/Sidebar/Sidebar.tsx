@@ -6,7 +6,7 @@ import SidebarHeader from "./SidebarHeader";
 
 export default function Sidebar() {
   return (
-    <div className="sidebarContainer">
+    <div className="flex flex-col h-full">
       <SidebarHeader />
 
       <SidebarRecents />

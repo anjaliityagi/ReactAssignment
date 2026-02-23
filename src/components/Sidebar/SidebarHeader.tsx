@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { createNote, fetchNotes } from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
+import { Plus } from "lucide-react";
 
 export default function SidebarHeader() {
   const [showSearch, setShowSearch] = useState(false);
@@ -19,14 +20,14 @@ export default function SidebarHeader() {
 
   return (
     <>
-      <div className="sidebarLogo">
-        <div className="sidebarLogoRow">
+      <div className="text-xl font-semibold mb-[18px]">
+        <div className="flex justify-between items-center">
           <span>
             <img src="/src/assets/Sidebarlogo.svg" alt="logo"></img>
           </span>
 
           <span
-            className="sidebarSearchIcon "
+            className="cursor-pointer"
             onClick={() => setShowSearch(!showSearch)}
           >
             {" "}
@@ -36,16 +37,19 @@ export default function SidebarHeader() {
       </div>
 
       {showSearch ? (
-        <div className="sidebarSearchContainer">
+        <div className="mb-4">
           <input
-            className="sidebarSearchInput"
-            placeholder="Search notes..."
+            className="w-full px-[10px] py-[9px] rounded-md bg-surface text-white text-sm outline-none border-none box-border"
+            placeholder:text-textMuted
             autoFocus
           />
         </div>
       ) : (
-        <button className="sidebarNewNoteBtn" onClick={handleCreateNote}>
-          <img src="/src/assets/AddNoteIcon.svg" alt="addNote" />
+        <button
+          className="w-full px-[10px] py-[9px] rounded-md bg-surface text-white text-sm outline-none border-none box-border"
+          onClick={handleCreateNote}
+        >
+          <Plus size={20} />
           New Note
         </button>
       )}

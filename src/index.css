@@ -1,3 +1,16 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap");
+
+@theme {
+  --color-background: #0f0f10;
+  --color-sidebar: #111113;
+  --color-surface: #1f1f22;
+  --color-notesBg: #151517;
+  --color-activeNote: #2a2a2e;
+  --color-primary: #ee3150;
+  --color-textMuted: #71717a;
+  --color-textSoft: #d4d4d8;
+}
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

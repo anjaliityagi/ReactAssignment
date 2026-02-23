@@ -3,6 +3,7 @@ import axios from "axios";
 const api = axios.create({
   baseURL: "https://nowted-server.remotestate.com",
 });
+
 export interface Folder {
   id: string;
   name: string;
@@ -29,6 +30,11 @@ export interface Note {
   content: string;
   isFavorite: false;
   isArchived: false;
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
+  folder: Folder;
 }
 export interface RecentNotes {
   title: string;

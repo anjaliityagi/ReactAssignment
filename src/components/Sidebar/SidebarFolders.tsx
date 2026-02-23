@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   createFolders,
   delFolder,
@@ -6,8 +7,14 @@ import {
   fetchFolders,
   type Folder,
 } from "../../api";
-
-export default function SidebarFolders() {
+interface SidebarFoldersProps {
+  selectedFolderId: string;
+  setSelectedFolderId: React.Dispatch<React.SetStateAction<string>>;
+}
+export default function SidebarFolders({
+  selectedFolderId,
+  setSelectedFolderId,
+}: SidebarFoldersProps) {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [showInput, setShowInput] = useState(false);
   const [input, setInput] = useState("");
@@ -15,10 +22,17 @@ export default function SidebarFolders() {
   const [editIndex, setEditIndex] = useState("");
   const [del, setDel] = useState(false);
   const [delIndex, setDelIndex] = useState("");
+  const navigate = useNavigate();
+
   useEffect(() => {
     fetchFolders().then((data) => {
       setFolders(data);
-      console.log(data);
+      console.log("folders", data);
+      console.log("selectedFolderId", selectedFolderId);
+
+      if (!selectedFolderId && folders.length > 0) {
+        setSelectedFolderId(folders[0].id);
+      }
     });
   }, []);
 
@@ -51,7 +65,14 @@ export default function SidebarFolders() {
 
       {folders.map((folder) => {
         return (
-          <div key={folder.id} className="sidebarItem sidebarLogoRow">
+          <div
+            key={folder.id}
+            onClick={() => {
+              setSelectedFolderId(folder.id);
+              navigate(`/folders/${folder.id}`);
+            }}
+            className="sidebarItem sidebarLogoRow"
+          >
             <div>
               <img src="src/assets/DocumentIcon.svg" />
               {edit && editIndex === folder.id ? (

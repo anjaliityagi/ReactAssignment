@@ -1,25 +1,31 @@
 import "./styles.css";
-
+import { useState } from "react";
 import Sidebar from "./components/Sidebar/Sidebar";
-import NotesList from "./components/NoteList/NoteList";
-//import NoteDetail from "./components/NoteDetails/NoteDetail";
+import NoteListItems from "./components/NoteList/NoteListItems";
+import { Outlet } from "react-router-dom";
 
 export default function App() {
+  const [selectedFolderId, setSelectedFolderId] = useState("");
+
   return (
     <div className="app">
-
       <div className="sidebar">
-        <Sidebar />
+        <Sidebar
+          selectedFolderId={selectedFolderId}
+          setSelectedFolderId={setSelectedFolderId}
+        />
       </div>
 
       <div className="notesList">
-        <NotesList />
+        <NoteListItems
+          selectedFolderId={selectedFolderId}
+          setSelectedFolderId={setSelectedFolderId}
+        />
       </div>
 
-      {/* <div className="noteDetail">
-        <NoteDetail />
-      </div> */}
-
+      <div className="noteDetail">
+        <Outlet context={{ selectedFolderId }} />
+      </div>
     </div>
   );
 }

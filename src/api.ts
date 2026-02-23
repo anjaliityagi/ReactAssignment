@@ -6,10 +6,14 @@ const api = axios.create({
 export interface Folder {
   id: string;
   name: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
 }
 
-export interface Note {
+export interface Notes {
   id: string;
+  folderId: string;
   title: string;
   isFavorite: true;
   isArchived: true;
@@ -19,7 +23,13 @@ export interface Note {
   preview: string;
   folder: Folder;
 }
-
+export interface Note {
+  folderId: string;
+  title: string;
+  content: string;
+  isFavorite: false;
+  isArchived: false;
+}
 export interface RecentNotes {
   title: string;
   preview: string;
@@ -56,4 +66,31 @@ export const delFolder = async (id: string) => {
   console.log(res.data);
 };
 
-//export const fetchRecents=async (): Promise<
+export const fetchNotes = async (id: string): Promise<Notes[]> => {
+  const res = await api.get(`/notes?folderId=${id}`);
+  return res.data.notes;
+};
+
+export const createNote = async (folderId: string): Promise<Note> => {
+  const res = await api.post("/notes", { folderId });
+  return res.data.notes;
+};
+
+// api.ts
+export const updateNote = async (
+  id: string,
+  data: { title?: string; content?: string },
+) => {
+  try {
+    const res = await api.patch(`/notes/${id}`, data);
+    return res.data.note; // or whatever the API returns
+  } catch (error) {
+    console.error("Failed to update note:", error);
+    throw error;
+  }
+};
+
+export const fetchNoteById = async (noteId: string): Promise<Note> => {
+  const res = await api.get(`/notes/${noteId}`);
+  return res.data.note;
+};

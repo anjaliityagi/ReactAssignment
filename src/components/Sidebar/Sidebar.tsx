@@ -1,21 +1,31 @@
-
 import SidebarRecents from "./SidebarRecents";
+
 import SidebarFolders from "./SidebarFolders";
 import SidebarMore from "./SidebarMore";
 import SidebarHeader from "./SidebarHeader";
-
-export default function Sidebar(){
+interface SidebarProps {
+  selectedFolderId: string;
+  setSelectedFolderId: React.Dispatch<React.SetStateAction<string>>;
+}
+export default function Sidebar({
+  selectedFolderId,
+  setSelectedFolderId,
+}: SidebarProps) {
   return (
     <div className="sidebarContainer">
-
-      <SidebarHeader/>
+      <SidebarHeader
+        selectedFolderId={selectedFolderId}
+        setSelectedFolderId={setSelectedFolderId}
+      />
 
       <SidebarRecents />
 
-      <SidebarFolders />
+      <SidebarFolders
+        selectedFolderId={selectedFolderId}
+        setSelectedFolderId={setSelectedFolderId}
+      />
 
       <SidebarMore />
-
     </div>
   );
 }

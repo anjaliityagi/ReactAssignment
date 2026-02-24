@@ -21,15 +21,25 @@ export default function SidebarFolders() {
 
   const { folderId } = useParams<{ folderId: string }>();
 
-  useEffect(() => {
-    fetchFolders().then((data) => {
-      setFolders(data);
-      console.log("folders", data);
+  // const render = async () => {
+  //   const data = await fetchFolders();
+  //   setFolders(data);
+  //   if (!folderId && data.length > 0) {
+  //     navigate(`/folders/${data[0]?.id}`);
+  //   }
+  // };
 
+  useEffect(() => {
+    const loadFolders = async () => {
+      const data = await fetchFolders();
+      setFolders(data);
       if (!folderId && data.length > 0) {
         navigate(`/folders/${data[0]?.id}`);
       }
-    });
+      console.log("folders", data);
+    };
+
+    loadFolders();
   }, []);
 
   console.log(input);

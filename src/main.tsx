@@ -15,6 +15,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <EmptyNote /> },
           { path: "notes/:noteId", element: <NoteView /> },
+          //  { path: "notes" },
         ],
       },
     ],

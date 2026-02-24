@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { fetchNotes, type Notes } from "../../api";
+import {
+  fetchArchive,
+  fetchDeleted,
+  fetchFav,
+  fetchNotes,
+  type Notes,
+} from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function NotesListItems() {
@@ -9,19 +15,28 @@ export default function NotesListItems() {
 
   useEffect(() => {
     if (folderId) {
-      fetchNotes(folderId).then((data) => {
+      const loadNotes = async () => {
+        const data =
+          folderId === "favorites"
+            ? await fetchFav(true)
+            : folderId === "archive"
+              ? await fetchArchive(true)
+              : folderId === "trash"
+                ? await fetchDeleted(true)
+                : await fetchNotes(folderId);
+
         setNotes(data);
-        console.log(data);
-      });
+      };
+      loadNotes();
     }
   }, [folderId]);
 
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-[10px] ">
       {notes.map((note) => {
         return (
           <div
-            className="p-3 rounded-lg cursor-pointer bg-transparent hover:bg-surface transition "
+            className="p-3 rounded-lg cursor-pointer bg-transparent hover:bg-surface transition"
             onClick={() => navigate(`/folders/${folderId}/notes/${note.id}`)}
           >
             <div className="font-medium mb-1">{note.title}</div>

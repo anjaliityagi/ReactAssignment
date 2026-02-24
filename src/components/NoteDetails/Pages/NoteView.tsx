@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import {
   Calendar,
   Folder,
@@ -9,7 +9,7 @@ import {
   Trash2,
 } from "lucide-react";
 import type { Note } from "../../../api";
-import { fetchNoteById, updateNote } from "../../../api";
+import { deleteNote, fetchNoteById, updateNote } from "../../../api";
 
 export default function NoteView() {
   const { noteId } = useParams<{ noteId: string }>();
@@ -17,7 +17,7 @@ export default function NoteView() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const navigate = useNavigate;
   useEffect(() => {
     async function loadNote() {
       if (!noteId) return;
@@ -55,7 +55,7 @@ export default function NoteView() {
   if (!note) return <div>Note not found</div>;
 
   return (
-    <div className="flex-1 flex flex-col p-6 overflow-auto">
+    <div className=" flex flex-col p-6 overflow-auto">
       <div className="flex justify-between items-start mb-4">
         <input
           className="bg-transparent border-none outline-none text-white text-2xl font-semibold"
@@ -71,13 +71,32 @@ export default function NoteView() {
           />
           {menuOpen && (
             <div className="absolute right-0 mt-2 w-44 bg-surface rounded-md shadow-lg border border-gray-700 text-sm text-textSoft z-10">
-              <div className="px-4 py-2 flex items-center gap-2 hover:bg-hoverBg cursor-pointer">
+              <div
+                className="px-4 py-2 flex items-center gap-2 hover:bg-hoverBg cursor-pointer"
+                onClick={async () => {
+                  if (!noteId) return;
+                  await updateNote(noteId, { isFavorite: true });
+                }}
+              >
                 <Star size={16} /> Add to favorites
               </div>
-              <div className="px-4 py-2 flex items-center gap-2 hover:bg-hoverBg cursor-pointer">
+              <div
+                className="px-4 py-2 flex items-center gap-2 hover:bg-hoverBg cursor-pointer"
+                onClick={async () => {
+                  if (!noteId) return;
+                  await updateNote(noteId, { isArchived: true });
+                }}
+              >
                 <Archive size={16} /> Archive
               </div>
-              <div className="px-4 py-2 flex items-center gap-2 hover:bg-hoverBg cursor-pointer">
+              <div
+                className="px-4 py-2 flex items-center gap-2 hover:bg-hoverBg cursor-pointer"
+                onClick={async () => {
+                  if (!noteId) return;
+                  await deleteNote(noteId);
+                  navigate();
+                }}
+              >
                 <Trash2 size={16} /> Delete
               </div>
             </div>

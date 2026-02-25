@@ -10,7 +10,14 @@
   --color-primary: green;
   --color-textMuted: #71717a;
   --color-textSoft: #d4d4d8;
+  --primary: #7c5cff;
+  --primaryhover: #6d4df0;
+  --surface: #1e1e1e;
+  --surfacelight: #2a2a2a;
+  --textsoft: #9ca3af;
+  --textmuted: #6b7280;
 }
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

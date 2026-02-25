@@ -6,12 +6,16 @@ import {
   fetchNotes,
   type Notes,
 } from "../../api";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 export default function NotesListItems() {
   const [notes, setNotes] = useState<Notes[]>([]);
   const navigate = useNavigate();
-  const { folderId } = useParams<{ folderId: string }>();
+  const { folderName, folderId } = useParams<{
+    folderName: string;
+    folderId: string;
+  }>();
+  const location = useLocation();
 
   useEffect(() => {
     if (folderId) {
@@ -32,25 +36,40 @@ export default function NotesListItems() {
   }, [folderId]);
 
   return (
-    <div className="flex flex-col gap-[10px] ">
+    <div className="flex flex-col gap-4 px-4 py-3 max-h-[calc(100vh)] overflow-y-auto scrollable-hide">
+      <div className="text-[30px]"> {folderName}</div>
       {notes.map((note) => {
+        const isActive = location.pathname.includes(note.id);
+
         return (
           <div
-            className="p-3 rounded-lg cursor-pointer bg-transparent hover:bg-surface transition"
-            onClick={() => navigate(`/folders/${folderId}/notes/${note.id}`)}
+            key={note.id}
+            onClick={() =>
+              navigate(`/${folderName}/${folderId}/notes/${note.id}`)
+            }
+            className={`
+             p-5 cursor-pointer
+            transition-all duration-200
+            shadow-sm
+            ${isActive ? "bg-[#232323]" : "bg-[#1C1C1C] hover:bg-[#222222]"}
+          `}
           >
-            <div className="font-medium mb-1">{note.title}</div>
-            <div className="text-[13px] text-gray-400 mb-1">{note.preview}</div>
-            <div className="text-xs text-gray-500">{note.createdAt}</div>
+            <h3 className="text-white text-[16px] font-medium mb-3 truncate">
+              {note.title}
+            </h3>
+
+            <div className="flex items-center gap-1 text-[13px]">
+              <span className="text-gray-500 whitespace-nowrap">
+                {new Date(note.createdAt).toLocaleDateString()}
+              </span>
+
+              <span className="text-gray-600">|</span>
+
+              <span className="text-gray-400 truncate">{note.preview}</span>
+            </div>
           </div>
         );
       })}
-
-      <div className="noteItem">
-        <div className="noteItemTitle">Grocery List</div>
-        <div className="noteItemPreview">Milk, Bread, Eggs, Coffee...</div>
-        <div className="noteItemDate">Yesterday</div>
-      </div>
     </div>
   );
 }

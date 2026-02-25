@@ -12,7 +12,7 @@ export default function MainLayout() {
         <NoteListItems />
       </div>
 
-      <div className="noteDetail">
+      <div className="flex-1 overflow-hidden w-[55%]">
         <Outlet />
       </div>
     </div>

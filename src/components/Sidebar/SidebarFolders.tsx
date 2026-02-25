@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, FolderClosed, FolderOpen, Delete } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   createFolders,
@@ -15,129 +15,127 @@ export default function SidebarFolders() {
   const [input, setInput] = useState("");
   const [edit, setEdit] = useState(false);
   const [editIndex, setEditIndex] = useState("");
-  //const [del, setDel] = useState(false);
-  //const [delIndex, setDelIndex] = useState("");
+
   const navigate = useNavigate();
-
-  const { folderId } = useParams<{ folderId: string }>();
-
-  // const render = async () => {
-  //   const data = await fetchFolders();
-  //   setFolders(data);
-  //   if (!folderId && data.length > 0) {
-  //     navigate(`/folders/${data[0]?.id}`);
-  //   }
-  // };
+  const { folderName, folderId } = useParams<{
+    folderName: string;
+    folderId: string;
+  }>();
 
   useEffect(() => {
     const loadFolders = async () => {
       const data = await fetchFolders();
       setFolders(data);
       if (!folderId && data.length > 0) {
-        navigate(`/folders/${data[0]?.id}`);
+        navigate(`/${data[0].name}/${data[0]?.id}`);
       }
-      console.log("folders", data);
     };
-
     loadFolders();
   }, []);
 
-  console.log(input);
-
   return (
-    <div className="mb-[22px] max-h-[30%] overflow-auto flex flex-col gap-2">
-      <div className="flex justify-between items-center text-xs text-textMuted mb-2">
+    <div className="mb-[22px] flex-1 overflow-auto flex flex-col gap-2">
+      <div className="flex justify-between items-center text-xs text-gray-500 mb-2 px-1">
         <span>Folders</span>
         <button
           className="cursor-pointer hover:text-white transition"
           onClick={() => setShowInput(!showInput)}
         >
-          <img src="/src/assets/AddFolder.svg" alt="addFolder" />
+          <Plus size={16} />
         </button>
       </div>
 
       {showInput && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 px-1">
           <input
+            autoFocus
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className="flex-1 px-[10px] py-2 rounded-md bg-surface text-white text-sm outline-none"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && input.trim()) {
+                createFolders(input);
+                setInput("");
+                setShowInput(false);
+              }
+              if (e.key === "Escape") {
+                setShowInput(false);
+              }
+            }}
+            className="flex-1 px-3 py-2 rounded-md bg-[#1E1E1E] text-white text-sm outline-none"
             placeholder="New folder name"
           />
-          <button
-            className="p-2 rounded-md bg-primary hover:opacity-90 transition"
-            onClick={() => {
-              createFolders(input);
-              setInput("");
-              setShowInput(false);
-            }}
-          >
-            <Plus size={18} />
-          </button>
         </div>
       )}
 
       {folders.map((folder) => {
         const isActive = folderId === folder.id;
+        const isEditing = edit && editIndex === folder.id;
 
         return (
           <div
             key={folder.id}
-            onClick={() => navigate(`/folders/${folder.id}`)}
-            className={`flex justify-between items-center px-[10px] py-2 rounded-md text-sm transition cursor-pointer ${
-              isActive
-                ? "bg-primary text-white"
-                : "text-textSoft hover:bg-surface"
-            }`}
+            onClick={() => navigate(`/${folder.name}/${folder.id}`)}
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              setEdit(true);
+              setEditIndex(folder.id);
+              setInput(folder.name);
+            }}
+            className={`
+              group flex justify-between items-center
+              px-3 py-2 rounded-lg text-sm cursor-pointer
+              transition-all duration-200
+              ${
+                isActive
+                  ? "bg-[#2A2A2A] text-white"
+                  : "text-gray-400 hover:bg-[#1E1E1E]"
+              }
+            `}
           >
-            <div className="flex items-center gap-2">
-              <img src="/src/assets/DocumentIcon.svg" alt="doc" />
+            <div className="flex items-center gap-2 flex-1">
+              {isActive ? (
+                <FolderOpen size={18} className="text-[#7C5CFF]" />
+              ) : (
+                <FolderClosed
+                  size={18}
+                  className="text-gray-400 group-hover:text-gray-200 transition"
+                />
+              )}
 
-              {edit && editIndex === folder.id ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    defaultValue={folder.name}
-                    onChange={(e) => setInput(e.target.value)}
-                    className="px-2 py-1 rounded bg-surface text-white text-sm outline-none"
-                  />
-                  <button
-                    className="text-xs bg-primary px-2 py-1 rounded"
-                    onClick={(e) => {
-                      e.stopPropagation();
+              {isEditing ? (
+                <input
+                  autoFocus
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
                       editFolder(folder.id, input);
                       setEdit(false);
-                    }}
-                  >
-                    Save
-                  </button>
-                </div>
+                    }
+                    if (e.key === "Escape") {
+                      setEdit(false);
+                    }
+                  }}
+                  onBlur={() => setEdit(false)}
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-[#1E1E1E] px-2 py-1 rounded-md text-white text-sm outline-none w-full"
+                />
               ) : (
-                <span>{folder.name}</span>
+                <span className="truncate">{folder.name}</span>
               )}
             </div>
 
-            <div className="flex gap-2">
+            {!isEditing && (
               <button
-                className="text-xs hover:text-white transition"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEdit(true);
-                  setEditIndex(folder.id);
-                }}
-              >
-                Edit
-              </button>
-
-              <button
-                className="text-xs hover:text-red-400 transition"
                 onClick={(e) => {
                   e.stopPropagation();
                   delFolder(folder.id);
                 }}
+                className="opacity-0 group-hover:opacity-100 transition duration-200 text-gray-500 hover:text-red-400"
               >
-                Delete
+                <Delete size={18} />
               </button>
-            </div>
+            )}
           </div>
         );
       })}

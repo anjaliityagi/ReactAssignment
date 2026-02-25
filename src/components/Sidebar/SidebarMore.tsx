@@ -1,21 +1,23 @@
 import { Trash2, Star, Archive, Folder } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 // import { fetchFav, type Notes } from "../../api";
 
 export default function SidebarMore() {
   const navigate = useNavigate();
 
+  const { folderName } = useParams<{ folderName: string }>();
+
   const handleFavorites = async () => {
-    navigate("folders/favorites");
+    navigate(`${folderName}/favorites`);
   };
   const handleDeleted = async () => {
-    navigate("folders/trash");
+    navigate(`${folderName}/trash`);
   };
   const handleArchive = async () => {
-    navigate("folders/archive");
+    navigate(`${folderName}/archive`);
   };
   return (
-    <div className=" fixed bottom-16 left-0 w-full pt-4 ">
+    <div className="  bottom-16 left-0 w-full pt-4 h-[20%]">
       <div className=" text-xs text-textMuted mb-3 uppercase tracking-wide">
         More
       </div>

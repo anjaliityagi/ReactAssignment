@@ -143,3 +143,8 @@ export const deleteNote = async (noteId: string) => {
   const res = await api.delete(`notes/${noteId}`);
   console.log(res.data);
 };
+
+export const restoreNote = async (noteId: string) => {
+  await api.post(`/notes/${noteId}/restore`);
+  return null;
+};

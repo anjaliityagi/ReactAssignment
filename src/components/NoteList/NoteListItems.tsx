@@ -3,50 +3,60 @@ import {
   fetchArchive,
   fetchDeleted,
   fetchFav,
+  fetchFolders,
   fetchNotes,
   type Notes,
 } from "../../api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+type filterType = "favorites" | "trash" | "archive";
 
 export default function NotesListItems() {
   const [notes, setNotes] = useState<Notes[]>([]);
   const navigate = useNavigate();
-  const { folderName, folderId } = useParams<{
-    folderName: string;
-    folderId: string;
+  const { filter, folderName, folderId } = useParams<{
+    filter?: filterType;
+    folderName?: string;
+    folderId?: string;
   }>();
   const location = useLocation();
+  console.log(filter);
+  console.log(folderName);
+  const isFavoriteRoute = filter === "favorites";
+  const isTrashRoute = filter === "trash";
+  const isArchivedRoute = filter === "archive";
+  console.log(isFavoriteRoute);
 
   useEffect(() => {
-    if (folderId) {
-      const loadNotes = async () => {
-        const data =
-          folderId === "favorites"
-            ? await fetchFav(true)
-            : folderId === "archive"
-              ? await fetchArchive(true)
-              : folderId === "trash"
-                ? await fetchDeleted(true)
-                : await fetchNotes(folderId);
+    const loadNotes = async () => {
+      const data = isFavoriteRoute
+        ? await fetchFav(true)
+        : isArchivedRoute
+          ? await fetchArchive(true)
+          : isTrashRoute
+            ? await fetchDeleted(true)
+            : folderId
+              ? await fetchNotes(folderId)
+              : [];
 
-        setNotes(data);
-      };
-      loadNotes();
-    }
-  }, [folderId]);
+      setNotes(data);
+    };
+    loadNotes();
+  }, [folderId, filter]);
 
   return (
     <div className="flex flex-col gap-4 px-4 py-3 max-h-[calc(100vh)] overflow-y-auto scrollable-hide">
-      <div className="text-[30px]"> {folderName}</div>
+      <div className="text-[30px]"> {filter ? filter : folderName}</div>
       {notes.map((note) => {
         const isActive = location.pathname.includes(note.id);
 
         return (
           <div
             key={note.id}
-            onClick={() =>
-              navigate(`/${folderName}/${folderId}/notes/${note.id}`)
-            }
+            onClick={() => {
+              const base = filter ? `/${filter}` : `/${folderName}/${folderId}`;
+
+              navigate(`${base}/notes/${note.id}`);
+            }}
             className={`
              p-5 cursor-pointer
             transition-all duration-200

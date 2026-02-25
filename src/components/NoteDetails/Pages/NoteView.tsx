@@ -86,7 +86,7 @@ export default function NoteView() {
 
   if (!note) return <div className="p-6 text-textSoft">Note not found</div>;
 
-  if (note.deletedAt) return <RestoreNote />;
+  if (!!note.deletedAt) return <RestoreNote />;
 
   return (
     <div className="flex flex-col h-full p-6 overflow-auto">

@@ -58,15 +58,12 @@ export const fetchFolders = async (): Promise<Folder[]> => {
   return res.data.folders;
 };
 
-export const createFolders = async (name: string): Promise<Folder[]> => {
+export const createFolders = async (name: string) => {
   try {
     const res = await api.post("/folders", { name });
     console.log(res.data);
-
-    return res.data.folders;
   } catch (error) {
     console.log(error);
-    return [];
   }
 };
 
@@ -104,6 +101,7 @@ export const createNote = async (
 export const updateNote = async (
   id: string,
   data: {
+    folderId?: string;
     title?: string;
     content?: string;
     isFavorite?: boolean;
@@ -147,4 +145,9 @@ export const deleteNote = async (noteId: string) => {
 export const restoreNote = async (noteId: string) => {
   await api.post(`/notes/${noteId}/restore`);
   return null;
+};
+
+export const searchNote = async (searchQuery: string): Promise<Notes[]> => {
+  const res = await api.get(`/notes?search=${encodeURIComponent(searchQuery)}`);
+  return res.data.notes;
 };

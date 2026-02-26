@@ -1,39 +1,62 @@
+import { useNotes } from "../../../context/NotesContext";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Calendar,
-  Folder,
+  FolderCheck,
   MoreVertical,
   Star,
   Archive,
   Trash2,
+  FolderArchive,
 } from "lucide-react";
-import type { Note } from "../../../api";
-import { deleteNote, fetchNoteById, updateNote } from "../../../api";
+import type { Folder, Note } from "../../../api";
+import {
+  deleteNote,
+  fetchNoteById,
+  updateNote,
+  fetchFolders,
+} from "../../../api";
 import RestoreNote from "./RestoreNote.tsx";
 
 export default function NoteView() {
-  const { noteId } = useParams<{ noteId: string }>();
+  const { loadNotes } = useNotes();
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const { noteId, filter, folderId, folderName } = useParams<{
+    noteId: string;
+    filter?: "favorites" | "trash" | "archive";
+    folderId?: string;
+    folderName: string;
+  }>();
+  const loadFolders = async () => {
+    const data = await fetchFolders();
+    setFolders(data);
+  };
+
   const [note, setNote] = useState<Note | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const [folderMenu, setFolderMenu] = useState(false);
+
+  async function loadNote() {
+    if (!noteId) return;
+
+    try {
+      const note = await fetchNoteById(noteId);
+      setNote(note);
+      setTitle(note?.title ?? "");
+      setContent(note?.content ?? "");
+    } catch (err) {
+      console.error("Failed to load note:", err);
+      setNote(null);
+    }
+  }
 
   useEffect(() => {
-    async function loadNote() {
-      if (!noteId) return;
-      try {
-        const note = await fetchNoteById(noteId);
-        setNote(note);
-        setTitle(note?.title ?? "");
-        setContent(note?.content ?? "");
-      } catch (err) {
-        console.error("Failed to load note:", err);
-        setNote(null);
-      }
-    }
     loadNote();
+    loadFolders();
   }, [noteId]);
 
   const autoSave = useCallback(
@@ -56,7 +79,11 @@ export default function NoteView() {
 
   const handleDelete = async () => {
     if (!noteId || !note) return;
+
     await deleteNote(noteId);
+
+    await loadNotes(filter, folderId);
+
     navigate(`/${note.folder.name}/${note.folderId}`);
   };
 
@@ -65,11 +92,14 @@ export default function NoteView() {
 
     await updateNote(noteId, { isFavorite: !note.isFavorite });
 
+    await loadNotes(filter, folderId);
+
     setNote((prev) =>
       prev ? { ...prev, isFavorite: !prev.isFavorite } : prev,
     );
 
     setMenuOpen(false);
+    navigate("/favorites");
   };
 
   const toggleArchive = async () => {
@@ -77,16 +107,19 @@ export default function NoteView() {
 
     await updateNote(noteId, { isArchived: !note.isArchived });
 
+    await loadNotes(filter, folderId);
+
     setNote((prev) =>
       prev ? { ...prev, isArchived: !prev.isArchived } : prev,
     );
 
     setMenuOpen(false);
+    navigate(`/${note.folder.name}/${note.folderId}`);
   };
 
   if (!note) return <div className="p-6 text-textSoft">Note not found</div>;
 
-  if (!!note.deletedAt) return <RestoreNote />;
+  if (note.deletedAt) return <RestoreNote />;
 
   return (
     <div className="flex flex-col h-full p-6 overflow-auto">
@@ -148,9 +181,54 @@ export default function NoteView() {
           <span>{new Date(note.createdAt).toLocaleDateString()}</span>
         </div>
 
-        <div className="flex items-center gap-1">
-          <Folder size={16} />
+        <div
+          className="relative flex items-center gap-1 ml-4 cursor-pointer"
+          onClick={() => setFolderMenu((p) => !p)}
+        >
+          <FolderArchive size={16} />
           <span>{note.folder.name}</span>
+
+          {folderMenu && (
+            <div
+              className="
+        absolute left-0 top-full mt-2
+        w-48
+        bg-[#1E1E1E]
+        rounded-xl
+        shadow-2xl
+        border border-gray-800
+        py-2
+        text-sm
+        text-gray-300
+        z-50
+      "
+            >
+              {folders.map((folder) => (
+                <div
+                  key={folder.id}
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    if (noteId) {
+                      await updateNote(note.id, { folderId: folder.id });
+
+                      navigate(`/${folder.name}/${folder.id}/notes/${noteId}`);
+                    }
+
+                    console.log("Move to folder:", folder.id);
+                    setFolderMenu(false);
+                  }}
+                  className="
+            px-4 py-2
+            hover:bg-[#2A2A2A]
+            cursor-pointer
+            transition
+          "
+                >
+                  {folder.name}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -166,6 +244,7 @@ export default function NoteView() {
 
 function debounce(func: Function, wait: number) {
   let timeout: number;
+
   return (...args: any[]) => {
     clearTimeout(timeout);
     timeout = window.setTimeout(() => func(...args), wait);

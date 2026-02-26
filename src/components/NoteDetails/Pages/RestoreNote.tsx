@@ -2,20 +2,22 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { History } from "lucide-react";
 import { restoreNote } from "../../../api";
 import { useState } from "react";
+import { useNotes } from "../../../context/NotesContext";
 
 export default function RestoreNotePage() {
   const { noteId } = useParams<{ noteId: string }>();
   const { state } = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-
+  const { loadNotes } = useNotes();
   const noteTitle = state?.title || "this note";
 
   const handleRestore = async () => {
     if (!noteId) return;
     setLoading(true);
     await restoreNote(noteId);
-    navigate(-1);
+    await navigate(`/trash`);
+    await loadNotes("trash");
   };
 
   return (

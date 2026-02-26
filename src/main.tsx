@@ -1,13 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import App from "./App";
+
+import { NotesProvider } from "./context/NotesContext";
+
+//import App from "./App";
 import EmptyNote from "./components/NoteDetails/Pages/EmptyNote";
 import NoteView from "./components/NoteDetails/Pages/NoteView";
 import "./index.css";
 import RestoreNote from "./components/NoteDetails/Pages/RestoreNote";
-import SidebarMore from "./components/Sidebar/SidebarMore";
-import NotesListItems from "./components/NoteList/NoteListItems";
+// import SidebarMore from "./components/Sidebar/SidebarMore";
+// import NotesListItems from "./components/NoteList/NoteListItems";
 import MainLayout from "./layout/MainLayout";
 const router = createBrowserRouter([
   {
@@ -36,6 +39,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <NotesProvider>
+      <RouterProvider router={router} />
+    </NotesProvider>
   </React.StrictMode>,
 );

@@ -8,6 +8,7 @@ import {
   fetchFolders,
   type Folder,
 } from "../../api";
+//import { useNotes } from "../../context/NotesContext";
 
 export default function SidebarFolders() {
   const [folders, setFolders] = useState<Folder[]>([]);
@@ -15,26 +16,38 @@ export default function SidebarFolders() {
   const [input, setInput] = useState("");
   const [edit, setEdit] = useState(false);
   const [editIndex, setEditIndex] = useState("");
-
+  //const { searchQuery, setSearchQuery } = useNotes();
   const navigate = useNavigate();
-  const { folderName, folderId } = useParams<{
-    folderName: string;
+  const { folderId } = useParams<{
     folderId: string;
   }>();
+  const loadFolders = async (delFolderId?: string) => {
+    const data = await fetchFolders();
+    setFolders(data);
+
+    if (input) {
+      const newfolder = data.find((f) => f.name === input);
+      navigate(`/${newfolder?.name}/${newfolder?.id}`);
+    }
+
+    if (delFolderId && delFolderId === folderId) {
+      if (data.length > 0) {
+        navigate(`/${data[0].name}/${data[0]?.id}`);
+      } else {
+        navigate("/");
+      }
+    }
+    if (!folderId && data.length > 0) {
+      navigate(`/${data[0].name}/${data[0].id}`);
+    }
+  };
 
   useEffect(() => {
-    const loadFolders = async () => {
-      const data = await fetchFolders();
-      setFolders(data);
-      if (!folderId && data.length > 0) {
-        navigate(`/${data[0].name}/${data[0]?.id}`);
-      }
-    };
     loadFolders();
   }, []);
 
   return (
-    <div className="mb-[22px] flex-1 overflow-auto flex flex-col gap-2">
+    <div className="mb-[22px] flex-1 overflow-auto scrollbar-hide flex flex-col gap-2">
       <div className="flex justify-between items-center text-xs text-gray-500 mb-2 px-1">
         <span>Folders</span>
         <button
@@ -51,11 +64,12 @@ export default function SidebarFolders() {
             autoFocus
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
+            onKeyDown={async (e) => {
               if (e.key === "Enter" && input.trim()) {
-                createFolders(input);
+                await createFolders(input);
                 setInput("");
                 setShowInput(false);
+                await loadFolders();
               }
               if (e.key === "Escape") {
                 setShowInput(false);
@@ -74,7 +88,10 @@ export default function SidebarFolders() {
         return (
           <div
             key={folder.id}
-            onClick={() => navigate(`/${folder.name}/${folder.id}`)}
+            onClick={() => {
+              navigate(`/${folder.name}/${folder.id}`);
+              //setSearchQuery("");
+            }}
             onDoubleClick={(e) => {
               e.stopPropagation();
               setEdit(true);
@@ -127,9 +144,11 @@ export default function SidebarFolders() {
 
             {!isEditing && (
               <button
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.stopPropagation();
-                  delFolder(folder.id);
+                  await delFolder(folder.id);
+                  setFolders((prev) => prev.filter((f) => f.id !== folder.id));
+                  await loadFolders(folder.id);
                 }}
                 className="opacity-0 group-hover:opacity-100 transition duration-200 text-gray-500 hover:text-red-400"
               >

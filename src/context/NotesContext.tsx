@@ -5,9 +5,7 @@ import {
   fetchFav,
   fetchNotes,
   type Notes,
-  searchNote,
 } from "../api";
-//import { useParams } from "react-router-dom";
 
 type Filter = "favorites" | "trash" | "archive";
 
@@ -15,12 +13,8 @@ type NotesContextType = {
   notes: Notes[];
   searchQuery: string;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
-
-  loadNotes: (
-    filter?: Filter,
-    folderId?: string,
-    searchQuery?: string,
-  ) => Promise<void>;
+  loadNotes: (filter?: Filter, folderId?: string) => Promise<void>;
+  listLoading: boolean;
 };
 
 const NotesContext = createContext<NotesContextType | null>(null);
@@ -28,14 +22,13 @@ const NotesContext = createContext<NotesContextType | null>(null);
 export function NotesProvider({ children }: { children: React.ReactNode }) {
   const [notes, setNotes] = useState<Notes[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  //   const { folderId } = useParams<{ folderId: string }>();
+  const [listLoading, setListLoading] = useState(false);
 
   const loadNotes = async (filter?: Filter, folderId?: string) => {
+    setListLoading(true); //
+
     let data: Notes[] = [];
 
-    // if (query && query.trim() !== "") {
-    //   data = await searchNote(query);
-    // } else
     if (filter === "favorites") {
       data = await fetchFav(true);
     } else if (filter === "archive") {
@@ -47,11 +40,18 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
     }
 
     setNotes(data);
+    setListLoading(false);
   };
 
   return (
     <NotesContext.Provider
-      value={{ notes, searchQuery, setSearchQuery, loadNotes }}
+      value={{
+        notes,
+        searchQuery,
+        setSearchQuery,
+        loadNotes,
+        listLoading,
+      }}
     >
       {children}
     </NotesContext.Provider>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, FolderClosed, FolderOpen, Delete } from "lucide-react";
+import { Plus, FolderClosed, FolderOpen, Trash } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   createFolders,
@@ -8,7 +8,7 @@ import {
   fetchFolders,
   type Folder,
 } from "../../api";
-//import { useNotes } from "../../context/NotesContext";
+import Skeleton from "../NoteList/Skeleton";
 
 export default function SidebarFolders() {
   const [folders, setFolders] = useState<Folder[]>([]);
@@ -16,30 +16,31 @@ export default function SidebarFolders() {
   const [input, setInput] = useState("");
   const [edit, setEdit] = useState(false);
   const [editIndex, setEditIndex] = useState("");
-  //const { searchQuery, setSearchQuery } = useNotes();
+  const [loading, setLoading] = useState(true);
+  const [folderToDelete, setFolderToDelete] = useState<Folder | null>(null);
+
   const navigate = useNavigate();
-  const { folderId } = useParams<{
-    folderId: string;
-  }>();
-  const loadFolders = async (delFolderId?: string) => {
+  const { folderId } = useParams<{ folderId: string }>();
+
+  const loadFolders = async (deletedId?: string) => {
+    setLoading(true);
+
     const data = await fetchFolders();
     setFolders(data);
 
-    if (input) {
-      const newfolder = data.find((f) => f.name === input);
-      navigate(`/${newfolder?.name}/${newfolder?.id}`);
+    if (!folderId && data.length > 0) {
+      navigate(`/${data[0].name}/${data[0].id}`);
     }
 
-    if (delFolderId && delFolderId === folderId) {
+    if (deletedId && deletedId === folderId) {
       if (data.length > 0) {
-        navigate(`/${data[0].name}/${data[0]?.id}`);
+        navigate(`/${data[0].name}/${data[0].id}`);
       } else {
         navigate("/");
       }
     }
-    if (!folderId && data.length > 0) {
-      navigate(`/${data[0].name}/${data[0].id}`);
-    }
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -47,117 +48,163 @@ export default function SidebarFolders() {
   }, []);
 
   return (
-    <div className="mb-[22px] flex-1 overflow-auto scrollbar-hide flex flex-col gap-2">
-      <div className="flex justify-between items-center text-xs text-gray-500 mb-2 px-1">
-        <span>Folders</span>
-        <button
-          className="cursor-pointer hover:text-white transition"
-          onClick={() => setShowInput(!showInput)}
-        >
-          <Plus size={16} />
-        </button>
+    <>
+      <div className="mb-[22px] flex-1 overflow-auto scrollbar-hide flex flex-col gap-2">
+        <div className="flex justify-between items-center text-xs text-[var(--text-gray-500)] mb-2 px-1">
+          <span>Folders</span>
+          <button
+            className="cursor-pointer hover:text-[var(--text-white)] transition"
+            onClick={() => setShowInput(!showInput)}
+          >
+            <Plus size={16} />
+          </button>
+        </div>
+
+        {showInput && (
+          <div className="flex items-center gap-2 px-1">
+            <input
+              autoFocus
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={async (e) => {
+                if (e.key === "Enter" && input.trim()) {
+                  await createFolders(input);
+                  setInput("");
+                  setShowInput(false);
+                  await loadFolders();
+                }
+                if (e.key === "Escape") setShowInput(false);
+              }}
+              className="flex-1 px-3 py-2 rounded-md bg-[var(--bg-input)] text-[var(--text-white)] text-sm outline-none"
+              placeholder="New folder name"
+            />
+          </div>
+        )}
+
+        {loading ? (
+          <div className="space-y-2">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="px-3 py-2 rounded-lg bg-[var(--bg-input)] flex items-center gap-3"
+              >
+                <Skeleton className="h-4 w-4 rounded" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          folders.map((folder) => {
+            const isActive = folderId === folder.id;
+            const isEditing = edit && editIndex === folder.id;
+
+            return (
+              <div
+                key={folder.id}
+                onClick={() => navigate(`/${folder.name}/${folder.id}`)}
+                onDoubleClick={(e) => {
+                  e.stopPropagation();
+                  setEdit(true);
+                  setEditIndex(folder.id);
+                  setInput(folder.name);
+                }}
+                className={`
+                  group flex justify-between items-center
+                  px-3 py-2 rounded-lg text-sm cursor-pointer
+                  transition-all duration-200
+                  ${
+                    isActive
+                      ? "bg-[var(--folder-active-bg)] text-[var(--text-white)]"
+                      : "text-[var(--text-gray-400)] hover:bg-[var(--bg-input)]"
+                  }
+                `}
+              >
+                <div className="flex items-center gap-2 flex-1">
+                  {isActive ? (
+                    <FolderOpen size={18} className="text-[var(--primary)]" />
+                  ) : (
+                    <FolderClosed
+                      size={18}
+                      className="text-[var(--text-gray-400)] group-hover:text-[var(--text-gray-200)] transition"
+                    />
+                  )}
+
+                  {isEditing ? (
+                    <input
+                      autoFocus
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={async (e) => {
+                        if (e.key === "Enter") {
+                          await editFolder(folder.id, input);
+                          setEdit(false);
+                          await loadFolders();
+                        }
+                        if (e.key === "Escape") setEdit(false);
+                      }}
+                      onBlur={() => setEdit(false)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="bg-[var(--bg-input)] px-2 py-1 rounded-md text-[var(--text-white)] text-sm outline-none w-full"
+                    />
+                  ) : (
+                    <span className="truncate">{folder.name}</span>
+                  )}
+                </div>
+
+                {!isEditing && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFolderToDelete(folder);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 transition duration-200 text-[var(--text-gray-500)] hover:text-[var(--danger-red)]"
+                  >
+                    <Trash size={18} />
+                  </button>
+                )}
+              </div>
+            );
+          })
+        )}
       </div>
 
-      {showInput && (
-        <div className="flex items-center gap-2 px-1">
-          <input
-            autoFocus
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={async (e) => {
-              if (e.key === "Enter" && input.trim()) {
-                await createFolders(input);
-                setInput("");
-                setShowInput(false);
-                await loadFolders();
-              }
-              if (e.key === "Escape") {
-                setShowInput(false);
-              }
-            }}
-            className="flex-1 px-3 py-2 rounded-md bg-[#1E1E1E] text-white text-sm outline-none"
-            placeholder="New folder name"
-          />
+      {folderToDelete && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="w-[400px] bg-[var(--bg-input)] rounded-xl shadow-2xl border border-[var(--border-gray-700)] p-6">
+            <h2 className="text-lg font-semibold text-[var(--text-white)] mb-3">
+              Delete Folder
+            </h2>
+
+            <p className="text-sm text-[var(--text-muted)] mb-6 leading-relaxed">
+              Are you sure you want to permanently delete the folder{" "}
+              <span className="text-[var(--text-white)] font-medium">
+                "{folderToDelete.name}"
+              </span>
+              ?
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setFolderToDelete(null)}
+                className="px-4 py-2 rounded-md text-sm bg-[var(--bg-hover)] text-[var(--text-white)] hover:opacity-90 transition"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={async () => {
+                  await delFolder(folderToDelete.id);
+                  await loadFolders(folderToDelete.id);
+                  setFolderToDelete(null);
+                }}
+                className="px-4 py-2 rounded-md text-sm bg-[var(--danger-red)] text-white hover:opacity-90 transition"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
-
-      {folders.map((folder) => {
-        const isActive = folderId === folder.id;
-        const isEditing = edit && editIndex === folder.id;
-
-        return (
-          <div
-            key={folder.id}
-            onClick={() => {
-              navigate(`/${folder.name}/${folder.id}`);
-              //setSearchQuery("");
-            }}
-            onDoubleClick={(e) => {
-              e.stopPropagation();
-              setEdit(true);
-              setEditIndex(folder.id);
-              setInput(folder.name);
-            }}
-            className={`
-              group flex justify-between items-center
-              px-3 py-2 rounded-lg text-sm cursor-pointer
-              transition-all duration-200
-              ${
-                isActive
-                  ? "bg-[#2A2A2A] text-white"
-                  : "text-gray-400 hover:bg-[#1E1E1E]"
-              }
-            `}
-          >
-            <div className="flex items-center gap-2 flex-1">
-              {isActive ? (
-                <FolderOpen size={18} className="text-[#7C5CFF]" />
-              ) : (
-                <FolderClosed
-                  size={18}
-                  className="text-gray-400 group-hover:text-gray-200 transition"
-                />
-              )}
-
-              {isEditing ? (
-                <input
-                  autoFocus
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      editFolder(folder.id, input);
-                      setEdit(false);
-                    }
-                    if (e.key === "Escape") {
-                      setEdit(false);
-                    }
-                  }}
-                  onBlur={() => setEdit(false)}
-                  onClick={(e) => e.stopPropagation()}
-                  className="bg-[#1E1E1E] px-2 py-1 rounded-md text-white text-sm outline-none w-full"
-                />
-              ) : (
-                <span className="truncate">{folder.name}</span>
-              )}
-            </div>
-
-            {!isEditing && (
-              <button
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  await delFolder(folder.id);
-                  setFolders((prev) => prev.filter((f) => f.id !== folder.id));
-                  await loadFolders(folder.id);
-                }}
-                className="opacity-0 group-hover:opacity-100 transition duration-200 text-gray-500 hover:text-red-400"
-              >
-                <Delete size={18} />
-              </button>
-            )}
-          </div>
-        );
-      })}
-    </div>
+    </>
   );
 }

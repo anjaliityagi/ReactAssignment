@@ -1,37 +1,39 @@
 import { useNotes } from "../../context/NotesContext";
-
 import { useState } from "react";
 import { createNote, searchNote, type Notes } from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Sun, Moon } from "lucide-react";
+import { useTheme } from "../../context/ThemeContext";
+import Logo from "./Logo";
 
 export default function SidebarHeader() {
   const [showSearch, setShowSearch] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState<Notes[]>([]);
   const navigate = useNavigate();
+
   const { folderName, folderId, filters } = useParams<{
     folderName: string;
     folderId: string;
     filters: "trash" | "archive" | "favorites";
   }>();
 
-  const { searchQuery, setSearchQuery } = useNotes();
-  const { loadNotes } = useNotes();
+  const { searchQuery, setSearchQuery, loadNotes } = useNotes();
+  const { theme, toggleTheme } = useTheme();
 
   const handleCreateNote = async () => {
     if (filters) return;
-
     if (!folderId) return;
 
     const newNote = await createNote(folderId, "", "", false, false);
     await loadNotes(undefined, folderId);
     navigate(`/${folderName}/${folderId}/notes/${newNote}`);
   };
+
   const searchingNotes = async (value: string) => {
     setSearchQuery(value);
 
-    if (value && value.trim() !== "") {
+    if (value.trim()) {
       const data = await searchNote(value);
       setResult(data);
       setShowResult(true);
@@ -44,19 +46,44 @@ export default function SidebarHeader() {
   return (
     <>
       <div className="flex justify-between items-center mb-6">
-        <img src="/src/assets/Sidebarlogo.svg" alt="logo" className="h-6" />
+        <Logo />
 
-        <button
-          onClick={() => setShowSearch(!showSearch)}
-          className="text-gray-400 hover:text-white transition"
-        >
-          <Search size={18} />
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleTheme}
+            className="
+              w-9 h-9
+              flex items-center justify-center
+              rounded-full
+              text-[var(--text-gray-400)]
+              hover:text-[var(--text-white)]
+              hover:bg-[var(--bg-hover)]
+              transition-all duration-200
+            "
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+
+          <button
+            onClick={() => setShowSearch(!showSearch)}
+            className="
+              w-9 h-9
+              flex items-center justify-center
+              rounded-full
+              text-[var(--text-gray-400)]
+              hover:text-[var(--text-white)]
+              hover:bg-[var(--bg-hover)]
+              transition-all duration-200
+            "
+          >
+            <Search size={18} />
+          </button>
+        </div>
       </div>
 
       {showSearch ? (
         <div
-          className="mb-5 relative"
+          className="mb-5 relative flex justify-center"
           onBlur={() => setShowResult(false)}
           tabIndex={0}
         >
@@ -67,13 +94,15 @@ export default function SidebarHeader() {
             onChange={(e) => searchingNotes(e.target.value)}
             placeholder="Search notes..."
             className="
-              w-full px-3 py-2.5
+              w-[260px] h-[40px]
+              px-3 py-2.5
               rounded-lg
-            bg-surface
-              text-white text-sm
-              placeholder:text-gray-500
+              bg-[var(--bg-input)]
+              text-[var(--text-white)]
+              text-sm
+              placeholder:text-[var(--text-gray-500)]
               outline-none
-              focus:ring-1 focus:ring-bg-primary
+              focus:ring-1 focus:ring-[var(--primary)]
               transition
             "
           />
@@ -81,32 +110,37 @@ export default function SidebarHeader() {
           {showResult && result.length > 0 && (
             <div
               className="
-        absolute top-full left-0 mt-2
-        w-full
-        bg-[#1E1E1E]
-        rounded-xl
-        shadow-2xl
-        border border-gray-800
-        max-h-60 overflow-y-auto
-        z-50
-      "
+                absolute top-full left-0 mt-2
+                w-full
+                bg-[var(--bg-input)]
+                rounded-xl
+                shadow-xl
+                border border-[var(--border-gray-800)]
+                max-h-60 overflow-y-auto
+                z-50
+              "
             >
               {result.map((note) => (
                 <div
                   key={note.id}
-                  onClick={() => {
+                  onMouseDown={() => {
                     setShowResult(false);
                     setSearchQuery("");
                     navigate(
                       `/${note.folder.name}/${note.folderId}/notes/${note.id}`,
                     );
                   }}
-                  className="px-4 py-2 hover:bg-[#2A2A2A] cursor-pointer"
+                  className="
+                    px-4 py-2
+                    hover:bg-[var(--note-active-bg)]
+                    cursor-pointer
+                    transition
+                  "
                 >
-                  <div className="text-sm text-white truncate">
+                  <div className="text-sm text-[var(--text-white)] truncate">
                     {note.title}
                   </div>
-                  <div className="text-xs text-gray-400 truncate">
+                  <div className="text-xs text-[var(--text-gray-400)] truncate">
                     {note.folder.name}
                   </div>
                 </div>
@@ -118,14 +152,16 @@ export default function SidebarHeader() {
         <button
           onClick={handleCreateNote}
           className="
-  mx-4 flex items-center justify-center gap-2
-  py-2.5 mb-6
-  rounded-lg
- bg-primary
-  text-white text-sm font-medium
- hover:bg-primaryHover
-  transition-all duration-200
-"
+            mx-4 flex justify-center gap-2
+            py-2.5 mb-6
+            rounded-lg
+            bg-[var(--primary)]
+            text-[var(--text-white)]
+            text-sm font-medium
+            hover:bg-[var(--primary-hover)]
+            transition-all duration-200
+            w-[260px] h-[40px] 
+          "
         >
           <Plus size={18} />
           New Note

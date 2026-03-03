@@ -21,14 +21,21 @@ export default function SidebarFolders() {
 
   const navigate = useNavigate();
   const { folderId } = useParams<{ folderId: string }>();
-
+  const { folderName } = useParams<{ folderName: string }>();
+  const { filter } = useParams<{ filter: string }>();
   const loadFolders = async (deletedId?: string) => {
     setLoading(true);
 
     const data = await fetchFolders();
     setFolders(data);
 
-    if (!folderId && data.length > 0) {
+    if (folderName) {
+      navigate(`/${folderName}/${folderId}`);
+    }
+    if (filter) {
+      navigate(`/${filter}`);
+    }
+    if (!folderId && !filter && data.length > 0) {
       navigate(`/${data[0].name}/${data[0].id}`);
     }
 

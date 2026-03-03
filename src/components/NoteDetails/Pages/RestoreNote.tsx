@@ -22,9 +22,7 @@ export default function RestoreNotePage() {
     console.log(updatedNote.deletedAt);
     console.log(noteId);
     setLoading(false);
-    await navigate(
-      `/${updatedNote.folder.name}/${updatedNote.folderId}/notes/${noteId}`,
-    );
+    await navigate(`/${updatedNote.folder.name}/${updatedNote.folderId}`);
 
     // await navigate(`/trash`);
     // await loadNotes("trash");

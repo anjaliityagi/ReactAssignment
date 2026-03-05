@@ -100,14 +100,14 @@
   --skeleton-bg: #2a2a2a;
 }
 
-.logo-nowted {
+/* .logo-nowted {
   font-family: "'Kaushan Script', cursive";
   font-weight: 400;
   font-size: 26px;
   line-height: 100%;
   letter-spacing: 0%;
   transform: "skewX(-3deg)";
-}
+} */
 
 .scrollbar-hide {
   -ms-overflow-style: none;

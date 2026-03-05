@@ -49,18 +49,18 @@ export interface RecentNotes {
 }
 
 export const fetchRecents = async (): Promise<RecentNotes[]> => {
-  const res = await api.get("/notes/recent");
+  const res = await api.get<{ recentNotes: RecentNotes[] }>("/notes/recent");
   return res.data.recentNotes;
 };
 
 export const fetchFolders = async (): Promise<Folder[]> => {
-  const res = await api.get("/folders");
+  const res = await api.get<{ folders: Folder[] }>("/folders");
   return res.data.folders;
 };
 
 export const createFolders = async (name: string) => {
   try {
-    const res = await api.post("/folders", { name });
+    const res = await api.post<{ folder: Folder }>("/folders", { name });
     console.log(res.data);
   } catch (error) {
     console.log(error);
@@ -68,7 +68,7 @@ export const createFolders = async (name: string) => {
 };
 
 export const editFolder = async (id: string, name: string) => {
-  const res = await api.patch(`/folders/${id}`, { name });
+  const res = await api.patch<{ folder: Folder }>(`/folders/${id}`, { name });
   console.log(res.data);
 };
 export const delFolder = async (id: string) => {
@@ -76,8 +76,19 @@ export const delFolder = async (id: string) => {
   console.log(res.data);
 };
 
-export const fetchNotes = async (id: string): Promise<Notes[]> => {
-  const res = await api.get(`/notes?folderId=${id}`);
+export const fetchNotes = async (
+  id: string,
+  page: number,
+  limit: number,
+): Promise<Notes[]> => {
+  const res = await api.get<{ notes: Notes[] }>("/notes", {
+    params: {
+      folderId: id,
+      page: page,
+      limit: limit,
+    },
+  });
+
   return res.data.notes;
 };
 
@@ -118,28 +129,60 @@ export const updateNote = async (
 };
 
 export const fetchNoteById = async (noteId: string): Promise<Note> => {
-  const res = await api.get(`/notes/${noteId}`);
+  const res = await api.get<{ note: Note }>(`/notes/${noteId}`);
   return res.data.note;
 };
 
-export const fetchFav = async (isFavorite: boolean): Promise<Notes[]> => {
-  const res = await api.get(`/notes?favorite=${isFavorite}`);
+export const fetchFav = async (
+  isFavorite: boolean,
+  page: number,
+  limit: number,
+): Promise<Notes[]> => {
+  const res = await api.get("/notes", {
+    params: {
+      favorite: isFavorite,
+      page: page,
+      limit: limit,
+    },
+  });
+
   return res.data.notes;
 };
 
-export const fetchArchive = async (isArchive: boolean): Promise<Notes[]> => {
-  const res = await api.get(`/notes?archived=${isArchive}`);
+export const fetchArchive = async (
+  isArchive: boolean,
+  page: number,
+  limit: number,
+): Promise<Notes[]> => {
+  const res = await api.get("/notes", {
+    params: {
+      archived: isArchive,
+      page: page,
+      limit: limit,
+    },
+  });
+
   return res.data.notes;
 };
 
-export const fetchDeleted = async (deleted: boolean): Promise<Notes[]> => {
-  const res = await api.get(`/notes?deleted=${deleted}`);
+export const fetchDeleted = async (
+  deleted: boolean,
+  page: number,
+  limit: number,
+): Promise<Notes[]> => {
+  const res = await api.get("/notes", {
+    params: {
+      deleted: deleted,
+      page: page,
+      limit: limit,
+    },
+  });
+
   return res.data.notes;
 };
-
 export const deleteNote = async (noteId: string) => {
   const res = await api.delete(`notes/${noteId}`);
-  console.log(res.data);
+  // console.log(res.data);
 };
 
 export const restoreNote = async (noteId: string) => {
@@ -148,6 +191,8 @@ export const restoreNote = async (noteId: string) => {
 };
 
 export const searchNote = async (searchQuery: string): Promise<Notes[]> => {
-  const res = await api.get(`/notes?search=${encodeURIComponent(searchQuery)}`);
+  const res = await api.get<{ notes: Notes[] }>(
+    `/notes?search=${encodeURIComponent(searchQuery)}`,
+  );
   return res.data.notes;
 };

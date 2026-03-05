@@ -10,6 +10,8 @@ export default function NotesListItems() {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const { notes, loadNotes } = useNotes();
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
   const { filter, folderName, folderId } = useParams<{
     filter?: filterType;
@@ -17,25 +19,45 @@ export default function NotesListItems() {
     folderId?: string;
   }>();
 
+  const loadMore = async () => {
+    const nextPage = page + 1;
+
+    await loadNotes(filter, folderId, nextPage, limit, true);
+
+    setPage(nextPage);
+  };
+  const handleScroll = async (e: React.UIEvent<HTMLDivElement>) => {
+    const bottom =
+      e.currentTarget.scrollHeight - e.currentTarget.scrollTop ===
+      e.currentTarget.clientHeight;
+
+    if (bottom) {
+      loadMore();
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      await loadNotes(filter, folderId);
+      setPage(1);
+
+      await loadNotes(filter, folderId, 1, limit, false);
+
       setLoading(false);
     };
 
     fetchData();
   }, [folderId, filter]);
-
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 py-3 border-b border-[var(--border-gray-800)]">
-        <div className="text-[28px] font-semibold text-[var(--text-white)] capitalize">
-          {filter ? filter : folderName}
-        </div>
+      <div className="text-[28px] font-semibold text-[var(--text-white)] px-4 py-3 border-b border-[var(--border-gray-800)] truncate capitalize">
+        {filter ? filter : folderName}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-3 scrollbar-hide ">
+      <div
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto px-4 py-3 scrollbar-hide"
+      >
         {loading ? (
           <div className="space-y-4">
             {[...Array(10)].map((_, i) => (
@@ -45,6 +67,11 @@ export default function NotesListItems() {
               </div>
             ))}
           </div>
+        ) : notes.length == 0 ? (
+          <p className="text-[var(--text-gray-500)] text-[15px] font-medium mb-2 flex justify-center align-center">
+            Nothing to show here...create a new note by clicking on NewNote
+            button
+          </p>
         ) : (
           notes.map((note) => {
             const isActive = location.pathname.includes(note.id);

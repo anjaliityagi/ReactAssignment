@@ -8,6 +8,7 @@ import {
   Archive,
   Trash2,
   FolderArchive,
+  ChevronDown,
 } from "lucide-react";
 import type { Folder, Note } from "../../../api";
 import {
@@ -20,7 +21,7 @@ import RestoreNote from "./RestoreNote";
 import Skeleton from "../../NoteList/Skeleton";
 
 export default function NoteView() {
-  const { loadNotes } = useNotes();
+  const { loadNotes, setNotes } = useNotes();
   const navigate = useNavigate();
 
   const { noteId, filter, folderId } = useParams<{
@@ -36,7 +37,7 @@ export default function NoteView() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [folderMenu, setFolderMenu] = useState(false);
   const [loading, setLoading] = useState(true);
-  // const [confirmDelete, setConfirmDelete] = useState(false);
+
   async function loadNote() {
     if (!noteId) return;
 
@@ -67,7 +68,22 @@ export default function NoteView() {
   const autoSave = useCallback(
     debounce((t: string, c: string) => {
       if (!noteId) return;
+
       updateNote(noteId, { title: t, content: c });
+
+      setNotes((prev) =>
+        prev.map((n) =>
+          n.id === noteId
+            ? {
+                ...n,
+                title: t,
+                content: c,
+                preview: c.slice(0, 50),
+                updatedAt: new Date().toDateString(),
+              }
+            : n,
+        ),
+      );
     }, 500),
     [noteId],
   );
@@ -87,18 +103,24 @@ export default function NoteView() {
 
     await deleteNote(noteId);
     await loadNotes(filter, folderId);
+
     navigate(`/${note.folder.name}/${note.folderId}`);
   };
 
   const toggleFavorite = async () => {
     if (!noteId || !note) return;
+
     const wasFavorite = note.isFavorite;
+
     await updateNote(noteId, { isFavorite: !note.isFavorite });
     await loadNotes(filter, folderId);
+
     setNote((prev) =>
       prev ? { ...prev, isFavorite: !prev.isFavorite } : prev,
     );
+
     setMenuOpen(false);
+
     if (filter === "favorites" && wasFavorite) {
       navigate("/favorites");
     }
@@ -106,14 +128,20 @@ export default function NoteView() {
 
   const toggleArchive = async () => {
     if (!noteId || !note) return;
+
     const wasArchived = note.isArchived;
+
     await updateNote(noteId, { isArchived: !note.isArchived });
     await loadNotes(filter, folderId);
+
     setNote((prev) =>
       prev ? { ...prev, isArchived: !prev.isArchived } : prev,
     );
+
     setMenuOpen(false);
+
     navigate(`/${note.folder.name}/${note.folderId}`);
+
     if (filter === "archive" && wasArchived) {
       navigate("/archive");
     }
@@ -127,16 +155,17 @@ export default function NoteView() {
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
       </div>
     );
   }
 
   if (!note)
-    return <div className="p-6 text-[var(--text-soft)]">Note not found</div>;
+    return (
+      <div className="flex justify-center items-center h-full text-[var(--text-gray-500)]">
+        Note not found
+      </div>
+    );
 
-  if (!!note.deletedAt) return <RestoreNote />;
   if (note.deletedAt) return <RestoreNote />;
 
   return (
@@ -200,31 +229,46 @@ export default function NoteView() {
         </div>
 
         <div
-          className="relative flex items-center gap-2 cursor-pointer"
-          onClick={() => setFolderMenu((p) => !p)}
+          className="relative flex items-center gap-2 cursor-pointer max-w-[220px]"
+          tabIndex={0}
+          onBlur={() => setFolderMenu(false)}
         >
-          <FolderArchive size={16} />
-          <span>{note.folder.name}</span>
+          <div
+            className="flex items-center gap-2 w-full"
+            onClick={() => setFolderMenu((p) => !p)}
+          >
+            <FolderArchive size={16} className="flex-shrink-0" />
+
+            <span className="truncate" title={note.folder.name}>
+              {note.folder.name}
+            </span>
+            <ChevronDown size={16} />
+          </div>
 
           {folderMenu && (
-            <div className="absolute left-0 top-full mt-2 w-52 bg-[var(--bg-input)] rounded-lg shadow-xl border border-[var(--border-gray-800)] py-2 text-sm text-[var(--text-gray-300)] z-20">
+            <div className="absolute left-0 top-full mt-2 w-52 max-h-80 overflow-y-auto bg-[var(--bg-input)] scrollbar-hide rounded-lg shadow-xl border border-[var(--border-gray-800)] py-2 text-sm text-[var(--text-gray-300)] z-20">
               {folders.map((folder) => (
                 <div
                   key={folder.id}
-                  onClick={async (e) => {
+                  onMouseDown={async (e) => {
                     e.stopPropagation();
                     if (!noteId) return;
 
                     await updateNote(note.id, {
                       folderId: folder.id,
                     });
+                    const updatedNote = await fetchNoteById(note.id);
 
-                    navigate(`/${folder.name}/${folder.id}/notes/${noteId}`);
+                    setNote(updatedNote);
+                    // fetchNoteById(folder.id);
+                    navigate(`/${folder.name}/${folder.id}/notes/${note.id}`);
                     setFolderMenu(false);
                   }}
-                  className="px-4 py-2 hover:bg-[var(--note-active-bg)] cursor-pointer transition"
+                  className="px-4 py-2 hover:bg-[var(--note-active-bg)] cursor-pointer flex items-center"
                 >
-                  {folder.name}
+                  <span className="truncate w-full" title={folder.name}>
+                    {folder.name}
+                  </span>
                 </div>
               ))}
             </div>
@@ -244,6 +288,7 @@ export default function NoteView() {
 
 function debounce(func: Function, wait: number) {
   let timeout: number;
+
   return (...args: any[]) => {
     clearTimeout(timeout);
     timeout = window.setTimeout(() => func(...args), wait);

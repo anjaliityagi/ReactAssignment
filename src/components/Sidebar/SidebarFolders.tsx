@@ -56,7 +56,7 @@ export default function SidebarFolders() {
 
   return (
     <>
-      <div className="mb-[22px] flex-1 overflow-auto scrollbar-hide flex flex-col gap-2">
+      <div className="mb-[22px] flex flex-col flex-1 min-h-0">
         <div className="flex justify-between items-center text-xs text-[var(--text-gray-500)] mb-2 px-1">
           <span>Folders</span>
           <button
@@ -68,7 +68,7 @@ export default function SidebarFolders() {
         </div>
 
         {showInput && (
-          <div className="flex items-center gap-2 px-1">
+          <div className="flex items-center gap-2 px-1 mb-2">
             <input
               autoFocus
               value={input}
@@ -88,93 +88,96 @@ export default function SidebarFolders() {
           </div>
         )}
 
-        {loading ? (
-          <div className="space-y-2">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="px-3 py-2 rounded-lg bg-[var(--bg-input)] flex items-center gap-3"
-              >
-                <Skeleton className="h-4 w-4 rounded" />
-                <Skeleton className="h-4 w-2/3" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          folders.map((folder) => {
-            const isActive = folderId === folder.id;
-            const isEditing = edit && editIndex === folder.id;
+        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide flex flex-col gap-2">
+          {loading ? (
+            <div className="space-y-2">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="px-3 py-2 rounded-lg bg-[var(--bg-input)] flex items-center gap-3"
+                >
+                  <Skeleton className="h-4 w-4 rounded" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            folders.map((folder) => {
+              const isActive = folderId === folder.id;
+              const isEditing = edit && editIndex === folder.id;
 
-            return (
-              <div
-                key={folder.id}
-                onClick={() => navigate(`/${folder.name}/${folder.id}`)}
-                onDoubleClick={(e) => {
-                  e.stopPropagation();
-                  setEdit(true);
-                  setEditIndex(folder.id);
-                  setInput(folder.name);
-                }}
-                className={`
-                  group flex justify-between items-center
-                  px-3 py-2 rounded-lg text-sm cursor-pointer
-                  transition-all duration-200
-                  ${
-                    isActive
-                      ? "bg-[var(--folder-active-bg)] text-[var(--text-white)]"
-                      : "text-[var(--text-gray-400)] hover:bg-[var(--bg-input)]"
-                  }
-                `}
-              >
-                <div className="flex items-center gap-2 flex-1">
-                  {isActive ? (
-                    <FolderOpen size={18} className="text-[var(--primary)]" />
-                  ) : (
-                    <FolderClosed
-                      size={18}
-                      className="text-[var(--text-gray-400)] group-hover:text-[var(--text-gray-200)] transition"
-                    />
-                  )}
+              return (
+                <div
+                  key={folder.id}
+                  onClick={() => navigate(`/${folder.name}/${folder.id}`)}
+                  onDoubleClick={(e) => {
+                    e.stopPropagation();
+                    setEdit(true);
+                    setEditIndex(folder.id);
+                    setInput(folder.name);
+                  }}
+                  className={`
+              group flex justify-between items-center
+              px-3 py-2 rounded-lg text-sm cursor-pointer 
+              transition-all duration-200
+              ${
+                isActive
+                  ? "bg-[var(--folder-active-bg)] text-[var(--text-white)]"
+                  : "text-[var(--text-gray-400)] hover:bg-[var(--bg-input)]"
+              }
+            `}
+                >
+                  <div className="flex items-center gap-2 flex-1">
+                    {isActive ? (
+                      <FolderOpen size={18} className="text-[var(--primary)]" />
+                    ) : (
+                      <FolderClosed
+                        size={18}
+                        className="text-[var(--text-gray-400)] group-hover:text-[var(--text-gray-200)] transition"
+                      />
+                    )}
 
-                  {isEditing ? (
-                    <input
-                      autoFocus
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyDown={async (e) => {
-                        if (e.key === "Enter") {
-                          await editFolder(folder.id, input);
-                          setEdit(false);
-                          await loadFolders();
-                        }
-                        if (e.key === "Escape") setEdit(false);
+                    {isEditing ? (
+                      <input
+                        autoFocus
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={async (e) => {
+                          if (e.key === "Enter") {
+                            await editFolder(folder.id, input);
+                            setEdit(false);
+                            await loadFolders();
+                          }
+                          if (e.key === "Escape") setEdit(false);
+                        }}
+                        onBlur={() => setEdit(false)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="bg-[var(--bg-input)] px-2 py-1 rounded-md text-[var(--text-white)] text-sm outline-none w-full"
+                      />
+                    ) : (
+                      <span className=" max-w-[200px] truncate">
+                        {folder.name}
+                      </span>
+                    )}
+                  </div>
+
+                  {!isEditing && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFolderToDelete(folder);
                       }}
-                      onBlur={() => setEdit(false)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="bg-[var(--bg-input)] px-2 py-1 rounded-md text-[var(--text-white)] text-sm outline-none w-full"
-                    />
-                  ) : (
-                    <span className="truncate">{folder.name}</span>
+                      className="opacity-0 group-hover:opacity-100 transition duration-200 text-[var(--text-gray-500)] hover:text-[var(--danger-red)]"
+                    >
+                      <Trash size={18} />
+                    </button>
                   )}
                 </div>
-
-                {!isEditing && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setFolderToDelete(folder);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 transition duration-200 text-[var(--text-gray-500)] hover:text-[var(--danger-red)]"
-                  >
-                    <Trash size={18} />
-                  </button>
-                )}
-              </div>
-            );
-          })
-        )}
+              );
+            })
+          )}
+        </div>
       </div>
-
       {folderToDelete && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="w-[400px] bg-[var(--bg-input)] rounded-xl shadow-2xl border border-[var(--border-gray-700)] p-6">
@@ -183,11 +186,7 @@ export default function SidebarFolders() {
             </h2>
 
             <p className="text-sm text-[var(--text-muted)] mb-6 leading-relaxed">
-              Are you sure you want to permanently delete the folder{" "}
-              <span className="text-[var(--text-white)] font-medium">
-                "{folderToDelete.name}"
-              </span>
-              ?
+              Are you sure you want to permanently delete this folder?
             </p>
 
             <div className="flex justify-end gap-3">

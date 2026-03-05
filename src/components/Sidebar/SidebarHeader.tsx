@@ -30,19 +30,23 @@ export default function SidebarHeader() {
     navigate(`/${folderName}/${folderId}/notes/${newNote}`);
   };
 
-  const searchingNotes = async (value: string) => {
+  let timer: number;
+  const searchingNotes = (value: string) => {
     setSearchQuery(value);
 
-    if (value.trim()) {
-      const data = await searchNote(value);
-      setResult(data);
-      setShowResult(true);
-    } else {
-      setResult([]);
-      setShowResult(false);
-    }
-  };
+    clearTimeout(timer);
 
+    timer = window.setTimeout(async () => {
+      if (value.trim()) {
+        const data = await searchNote(value);
+        setResult(data);
+        setShowResult(true);
+      } else {
+        setResult([]);
+        setShowResult(false);
+      }
+    }, 400);
+  };
   return (
     <>
       <div className="flex justify-between items-center mb-6">
@@ -81,92 +85,93 @@ export default function SidebarHeader() {
         </div>
       </div>
 
-      {showSearch ? (
-        <div
-          className="mb-5 relative flex justify-center"
-          onBlur={() => setShowResult(false)}
-          tabIndex={0}
-        >
-          <input
-            autoFocus
-            type="text"
-            value={searchQuery}
-            onChange={(e) => searchingNotes(e.target.value)}
-            placeholder="Search notes..."
-            className="
-              w-[260px] h-[40px]
-              px-3 py-2.5
-              rounded-lg
-              bg-[var(--bg-input)]
-              text-[var(--text-white)]
-              text-sm
-              placeholder:text-[var(--text-gray-500)]
-              outline-none
-              focus:ring-1 focus:ring-[var(--primary)]
-              transition
-            "
-          />
-
-          {showResult && result.length > 0 && (
-            <div
+      <div className="flex justify-center mb-6 relative">
+        {showSearch ? (
+          <div
+            className="relative w-[260px]"
+            onBlur={() => setShowResult(false)}
+            tabIndex={0}
+          >
+            <input
+              autoFocus
+              type="text"
+              value={searchQuery}
+              onChange={(e) => searchingNotes(e.target.value)}
+              placeholder="Search notes..."
               className="
-                absolute top-full left-0 mt-2
-                w-full
-                bg-[var(--bg-input)]
-                rounded-xl
-                shadow-xl
-                border border-[var(--border-gray-800)]
-                max-h-60 overflow-y-auto
-                z-50
-              "
-            >
-              {result.map((note) => (
-                <div
-                  key={note.id}
-                  onMouseDown={() => {
-                    setShowResult(false);
-                    setSearchQuery("");
-                    navigate(
-                      `/${note.folder.name}/${note.folderId}/notes/${note.id}`,
-                    );
-                  }}
-                  className="
-                    px-4 py-2
-                    hover:bg-[var(--note-active-bg)]
-                    cursor-pointer
-                    transition
-                  "
-                >
-                  <div className="text-sm text-[var(--text-white)] truncate">
-                    {note.title}
-                  </div>
-                  <div className="text-xs text-[var(--text-gray-400)] truncate">
-                    {note.folder.name}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <button
-          onClick={handleCreateNote}
-          className="
-            mx-4 flex justify-center gap-2
-            py-2.5 mb-6
-            rounded-lg
-            bg-[var(--primary)]
-            text-[var(--text-white)]
-            text-sm font-medium
-            hover:bg-[var(--primary-hover)]
-            transition-all duration-200
-            w-[260px] h-[40px] 
+          w-full h-[40px]
+          px-3 py-2.5
+          rounded-lg
+          bg-[var(--bg-input)]
+          text-[var(--text-white)]
+          text-sm
+          placeholder:text-[var(--text-gray-500)]
+          outline-none
+          focus:ring-1 focus:ring-[var(--primary)]
+          transition
+        "
+            />
+
+            {showResult && result.length > 0 && (
+              <div
+                className="
+            absolute top-full left-0 mt-2
+            w-full
+            bg-[var(--bg-input)]
+            rounded-xl
+            shadow-xl
+            border border-[var(--border-gray-800)]
+            max-h-60 overflow-y-auto
+            z-50
           "
-        >
-          <Plus size={18} />
-          New Note
-        </button>
-      )}
+              >
+                {result.map((note) => (
+                  <div
+                    key={note.id}
+                    onMouseDown={() => {
+                      setShowResult(false);
+                      setSearchQuery("");
+                      navigate(
+                        `/${note.folder.name}/${note.folderId}/notes/${note.id}`,
+                      );
+                    }}
+                    className="
+                px-4 py-2
+                hover:bg-[var(--note-active-bg)]
+                cursor-pointer
+                transition
+              "
+                  >
+                    <div className="text-sm text-[var(--text-white)] truncate">
+                      {note.title}
+                    </div>
+                    <div className="text-xs text-[var(--text-gray-400)] truncate">
+                      {note.folder.name}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <button
+            onClick={handleCreateNote}
+            className="
+        flex justify-center items-center gap-2
+        w-[260px] h-[40px]
+        rounded-lg
+        bg-[var(--primary)]
+        text-[var(--text-white)]
+        text-sm font-medium
+        hover:bg-[var(--primary-hover)]
+        transition
+      "
+          >
+            <Plus size={18} />
+            New Note
+          </button>
+        )}
+      </div>
     </>
   );
 }

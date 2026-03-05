@@ -15,12 +15,13 @@ export default function RestoreNotePage() {
   const handleRestore = async () => {
     if (!noteId) return;
     setLoading(true);
-    console.log(noteId);
+    // console.log(noteId);
     await restoreNote(noteId);
     const updatedNote = await fetchNoteById(noteId);
-    console.log(updatedNote.id);
-    console.log(updatedNote.deletedAt);
-    console.log(noteId);
+
+    // console.log(updatedNote.id);
+    // console.log(updatedNote.deletedAt);
+    // console.log(noteId);
     setLoading(false);
     await navigate(`/${updatedNote.folder.name}/${updatedNote.folderId}`);
 

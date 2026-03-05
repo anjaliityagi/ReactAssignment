@@ -54,7 +54,7 @@ export default function SidebarRecents() {
               className={`
                 group flex justify-between items-center
                 px-3 py-2 rounded-lg text-sm cursor-pointer
-                transition-all duration-200
+                transition-all duration-200 truncate
                 ${
                   isActive
                     ? "bg-[var(--primary)] text-[var(--text-white)]"

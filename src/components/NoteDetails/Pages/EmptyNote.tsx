@@ -9,11 +9,9 @@ export default function EmptyNote() {
             <FileText size={32} className="text-[var(--text-white)]" />
           </div>
         </div>
-
         <h2 className="text-2xl font-semibold text-[var(--text-white)] mb-3">
           Select a note to view
         </h2>
-
         <p className="text-sm text-[var(--text-gray-400)] leading-relaxed">
           Choose a note from the list on the left to view its contents, or
           create a new note to add to your collection.

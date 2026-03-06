@@ -181,7 +181,7 @@ export const fetchDeleted = async (
   return res.data.notes;
 };
 export const deleteNote = async (noteId: string) => {
-  const res = await api.delete(`notes/${noteId}`);
+  await api.delete(`notes/${noteId}`);
   // console.log(res.data);
 };
 

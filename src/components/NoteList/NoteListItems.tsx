@@ -15,7 +15,7 @@ export default function NotesListItems() {
   const observerRef = useRef<HTMLDivElement | null>(null);
 
   const [loadingMore, setLoadingMore] = useState(false);
-
+  const [hasMore, setHasMore] = useState(true);
   const { filter, folderName, folderId } = useParams<{
     filter?: filterType;
     folderName?: string;
@@ -25,6 +25,7 @@ export default function NotesListItems() {
   const pageRef = useRef(page);
   const loadingRef = useRef(loading);
   const loadingMoreRef = useRef(loadingMore);
+  const hasMoreRef = useRef(hasMore);
   // const loadMore = async () => {
   //   const nextPage = page + 1;
 
@@ -45,16 +46,18 @@ export default function NotesListItems() {
     pageRef.current = page;
     loadingRef.current = loading;
     loadingMoreRef.current = loadingMore;
-  }, [page, loading, loadingMore]);
+    hasMoreRef.current = hasMore;
+  }, [page, loading, loadingMore, hasMore]);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setPage(1);
 
-      await loadNotes(filter, folderId, 1, limit, false);
+      const data = await loadNotes(filter, folderId, 1, limit, false);
 
       setLoading(false);
+      setHasMore(data.length === limit);
     };
 
     fetchData();
@@ -64,16 +67,25 @@ export default function NotesListItems() {
     const observer = new IntersectionObserver(
       async (entries) => {
         const entry = entries[0];
-        if (entry.isIntersecting) {
+        if (
+          entry.isIntersecting &&
+          !loadingMoreRef.current &&
+          !loadingRef.current &&
+          hasMoreRef.current
+        ) {
           setLoadingMore(true);
           const nextPage = pageRef.current + 1;
-          await loadNotes(filter, folderId, nextPage, limit, true);
-
+          const data = await loadNotes(filter, folderId, nextPage, limit, true);
+          if (data.length < limit) {
+            setHasMore(false);
+          } else {
+            setHasMore(true);
+          }
           setPage(nextPage);
           setLoadingMore(false);
         }
       },
-      { root: containerRef.current, rootMargin: "200px", threshold: 0 },
+      { root: null, rootMargin: "500px", threshold: 0 },
     );
     const current = observerRef.current;
 
@@ -83,6 +95,11 @@ export default function NotesListItems() {
       if (current) observer.unobserve(current);
     };
   }, [folderId, filter]);
+
+  const isScrollable =
+    containerRef.current &&
+    containerRef.current.scrollHeight > containerRef.current.clientHeight + 5;
+
   return (
     <div className="flex flex-col h-full">
       <div className="text-[28px] font-semibold text-[var(--text-white)] px-4 py-3 border-b border-[var(--border-gray-800)] truncate capitalize">
@@ -149,12 +166,16 @@ export default function NotesListItems() {
             );
           })
         )}
-        {loadingMore && (
-          <div className="text-center py-4">
-            <div className="p-5 rounded-xl bg-[var(--note-bg)]">
-              <Skeleton className="h-5 w-3/4 mb-3" />
-              <Skeleton className="h-4 w-1/2" />
-            </div>
+        {loadingMore && isScrollable && (
+          // <div className="p-5 rounded-xl bg-[var(--note-bg)]">
+          //   <Skeleton className="h-5 w-3/4 mb-3" />
+          //   <Skeleton className="h-4 w-1/2" />
+          // </div>
+          <div className="flex justify-center transition"> Loading more...</div>
+        )}
+        {!hasMore && notes.length > 0 && (
+          <div className="flex justify-center py-4 text-sm text-[var(--text-gray-500)]">
+            No more notes
           </div>
         )}
         <div ref={observerRef} className="h-5 w-20"></div>

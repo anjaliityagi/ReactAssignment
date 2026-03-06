@@ -19,7 +19,7 @@ type NotesContextType = {
     page?: number,
     limit?: number,
     append?: boolean,
-  ) => Promise<void>;
+  ) => Promise<Notes[]>;
   listLoading: boolean;
   setNotes: React.Dispatch<React.SetStateAction<Notes[]>>;
 };
@@ -30,6 +30,7 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
   const [notes, setNotes] = useState<Notes[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [listLoading, setListLoading] = useState(false);
+
   const loadNotes = async (
     filter?: Filter,
     folderId?: string,
@@ -58,6 +59,7 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
     }
 
     setListLoading(false);
+    return data;
   };
 
   return (

@@ -171,7 +171,10 @@ export default function NotesListItems() {
           //   <Skeleton className="h-5 w-3/4 mb-3" />
           //   <Skeleton className="h-4 w-1/2" />
           // </div>
-          <div className="flex justify-center transition"> Loading more...</div>
+          <div className="flex justify-center text-[var(--text-gray-500)] transition">
+            {" "}
+            Loading more...
+          </div>
         )}
         {!hasMore && notes.length > 0 && (
           <div className="flex justify-center py-4 text-sm text-[var(--text-gray-500)]">

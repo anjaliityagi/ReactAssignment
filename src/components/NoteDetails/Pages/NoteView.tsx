@@ -37,6 +37,9 @@ export default function NoteView() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [folderMenu, setFolderMenu] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   async function loadNote() {
     if (!noteId) return;
@@ -63,14 +66,20 @@ export default function NoteView() {
   useEffect(() => {
     loadNote();
     loadFolders();
-  }, [noteId]);
+  }, [noteId, folderId]);
 
   const autoSave = useCallback(
-    debounce((t: string, c: string) => {
+    debounce(async (t: string, c: string) => {
       if (!noteId) return;
 
-      updateNote(noteId, { title: t, content: c });
+      setSaving(true);
+      await updateNote(noteId, { title: t, content: c });
+      setSaving(false);
+      setSaved(true);
 
+      setTimeout(() => {
+        setSaved(false);
+      }, 2000);
       setNotes((prev) =>
         prev.map((n) =>
           n.id === noteId
@@ -84,7 +93,7 @@ export default function NoteView() {
             : n,
         ),
       );
-    }, 500),
+    }, 1000),
     [noteId],
   );
 
@@ -97,14 +106,24 @@ export default function NoteView() {
     setContent(e.target.value);
     autoSave(title, e.target.value);
   };
-
   const handleDelete = async () => {
     if (!noteId || !note) return;
 
-    await deleteNote(noteId);
-    await loadNotes(filter, folderId);
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      return;
+    }
 
-    navigate(`/${note.folder.name}/${note.folderId}`);
+    await deleteNote(noteId);
+    loadNotes(filter, folderId);
+
+    navigate(
+      filter
+        ? `/${filter}/notes/${noteId}/restore`
+        : `/${note.folder.name}/${note.folder.id}/notes/${note.id}`,
+    );
+
+    setConfirmDelete(false);
   };
 
   const toggleFavorite = async () => {
@@ -159,6 +178,8 @@ export default function NoteView() {
     );
   }
 
+  // console.log("NOte: " + note?.deletedAt);
+
   if (!note)
     return (
       <div className="flex justify-center items-center h-full text-[var(--text-gray-500)]">
@@ -169,7 +190,7 @@ export default function NoteView() {
   if (note.deletedAt) return <RestoreNote />;
 
   return (
-    <div className="flex flex-col h-full p-8 overflow-auto">
+    <div className="flex flex-col h-full p-8 overflow-auto relative">
       <div className="flex justify-between items-start mb-6">
         <input
           className="bg-transparent border-none outline-none text-[var(--text-white)] text-3xl font-semibold w-full tracking-tight"
@@ -257,9 +278,9 @@ export default function NoteView() {
                     await updateNote(note.id, {
                       folderId: folder.id,
                     });
-                    const updatedNote = await fetchNoteById(note.id);
+                    // const updatedNote = await fetchNoteById(note.id);
+                    // setNote(updatedNote);
 
-                    setNote(updatedNote);
                     // fetchNoteById(folder.id);
                     navigate(`/${folder.name}/${folder.id}/notes/${note.id}`);
                     setFolderMenu(false);
@@ -282,6 +303,47 @@ export default function NoteView() {
         onChange={handleContentChange}
         placeholder="Start typing..."
       />
+
+      {saving ? (
+        <div className="absolute bottom-8 right-10 text-[var(--text-gray-400)] text-lg">
+          Saving...
+        </div>
+      ) : saved ? (
+        <div className="absolute bottom-8 right-10 text-[var(--text-gray-400)] text-lg">
+          Saved.
+        </div>
+      ) : (
+        ""
+      )}
+      {confirmDelete && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-[var(--bg-input)] p-6 rounded-xl shadow-xl w-[320px]">
+            <div className="text-[var(--text-white)] text-lg font-medium mb-3">
+              Delete this note?
+            </div>
+
+            <p className="text-[var(--text-gray-400)] text-sm mb-6">
+              This note will be moved to trash. You can restore it later.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="px-4 py-2 rounded-lg text-sm bg-[var(--note-bg)] hover:bg-[var(--note-hover-bg)]"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 rounded-lg text-sm bg-red-500 hover:opacity-90 text-white"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

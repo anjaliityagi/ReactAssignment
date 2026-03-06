@@ -2,14 +2,18 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { History } from "lucide-react";
 import { restoreNote, fetchNoteById } from "../../../api";
 import { useState } from "react";
-// import { useNotes } from "../../../context/NotesContext";
+import { useNotes } from "../../../context/NotesContext";
 
 export default function RestoreNotePage() {
-  const { noteId } = useParams<{ noteId: string }>();
+  const { noteId, filter, folderId } = useParams<{
+    noteId: string;
+    filter?: "favorites" | "trash" | "archive";
+    folderId: string;
+  }>();
   const { state } = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  // const { loadNotes } = useNotes();
+  const { loadNotes } = useNotes();
   const noteTitle = state?.title || "this note";
 
   const handleRestore = async () => {
@@ -17,13 +21,19 @@ export default function RestoreNotePage() {
     setLoading(true);
     // console.log(noteId);
     await restoreNote(noteId);
+    await loadNotes(filter, folderId);
     const updatedNote = await fetchNoteById(noteId);
 
     // console.log(updatedNote.id);
     // console.log(updatedNote.deletedAt);
     // console.log(noteId);
     setLoading(false);
-    await navigate(`/${updatedNote.folder.name}/${updatedNote.folderId}`);
+
+    navigate(
+      filter
+        ? `/${filter}/notes/${updatedNote.id}`
+        : `/${updatedNote.folder.name}/${updatedNote.folderId}/notes/${updatedNote.id}`,
+    );
 
     // await navigate(`/trash`);
     // await loadNotes("trash");

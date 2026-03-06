@@ -96,9 +96,9 @@ export default function NotesListItems() {
     };
   }, [folderId, filter]);
 
-  const isScrollable =
-    containerRef.current &&
-    containerRef.current.scrollHeight > containerRef.current.clientHeight + 5;
+  // const isScrollable =
+  //   containerRef.current &&
+  //   containerRef.current.scrollHeight > containerRef.current.clientHeight + 5;
 
   return (
     <div className="flex flex-col h-full">
@@ -166,7 +166,7 @@ export default function NotesListItems() {
             );
           })
         )}
-        {loadingMore && isScrollable && (
+        {loadingMore && (
           // <div className="p-5 rounded-xl bg-[var(--note-bg)]">
           //   <Skeleton className="h-5 w-3/4 mb-3" />
           //   <Skeleton className="h-4 w-1/2" />

@@ -130,15 +130,13 @@ export default function NoteView() {
     if (!noteId || !note) return;
 
     const wasFavorite = note.isFavorite;
-
+    setMenuOpen(false);
     await updateNote(noteId, { isFavorite: !note.isFavorite });
     await loadNotes(filter, folderId);
 
     setNote((prev) =>
       prev ? { ...prev, isFavorite: !prev.isFavorite } : prev,
     );
-
-    setMenuOpen(false);
 
     if (filter === "favorites" && wasFavorite) {
       navigate("/favorites");
@@ -149,7 +147,7 @@ export default function NoteView() {
     if (!noteId || !note) return;
 
     const wasArchived = note.isArchived;
-
+    setMenuOpen(false);
     await updateNote(noteId, { isArchived: !note.isArchived });
     await loadNotes(filter, folderId);
 
@@ -157,9 +155,9 @@ export default function NoteView() {
       prev ? { ...prev, isArchived: !prev.isArchived } : prev,
     );
 
-    setMenuOpen(false);
-
-    navigate(`/${note.folder.name}/${note.folderId}`);
+    filter
+      ? navigate(`/${filter}`)
+      : navigate(`/${note.folder.name}/${note.folderId}`);
 
     if (filter === "archive" && wasArchived) {
       navigate("/archive");

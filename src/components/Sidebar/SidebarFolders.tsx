@@ -110,13 +110,13 @@ export default function SidebarFolders() {
               return (
                 <div
                   key={folder.id}
-                  onClick={() => navigate(`/${folder.name}/${folder.id}`)}
                   onDoubleClick={(e) => {
                     e.stopPropagation();
                     setEdit(true);
                     setEditIndex(folder.id);
                     setInput(folder.name);
                   }}
+                  onClick={() => navigate(`/${folder.name}/${folder.id}`)}
                   className={`
               group flex justify-between items-center
               px-3 py-2 rounded-lg text-sm cursor-pointer 
@@ -148,6 +148,9 @@ export default function SidebarFolders() {
                             await editFolder(folder.id, input);
                             setEdit(false);
                             await loadFolders();
+                            navigate(`/${input}/${folder.id}`, {
+                              replace: true,
+                            });
                           }
                           if (e.key === "Escape") setEdit(false);
                         }}

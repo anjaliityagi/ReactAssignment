@@ -100,7 +100,6 @@ export default function NoteView() {
 
       setTimeout(() => setSaved(false), 2000);
 
-      // update notes list
       setNotes((prev) =>
         prev.map((n) =>
           n.id === noteId

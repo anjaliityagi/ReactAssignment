@@ -27,8 +27,6 @@ export default function SidebarFolders() {
 
   const loadFolders = useCallback(
     async (deletedId?: string) => {
-      setLoading(true);
-
       const data = await fetchFolders();
       setFolders(data);
 
@@ -78,7 +76,12 @@ export default function SidebarFolders() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={async (e) => {
                 if (e.key === "Enter" && input.trim()) {
-                  if (folders.some((folder) => folder.name === input)) {
+                  if (
+                    folders.some(
+                      (folder) =>
+                        folder.name.toLowerCase() === input.toLowerCase(),
+                    )
+                  ) {
                     toast.success(
                       "this folder already exist, give another name",
                     );

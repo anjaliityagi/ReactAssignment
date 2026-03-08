@@ -77,12 +77,21 @@ export default function SidebarFolders() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={async (e) => {
                 if (e.key === "Enter" && input.trim()) {
+                  if (folders.some((folder) => folder.name === input)) {
+                    toast.success(
+                      "this folder already exist, give another name",
+                    );
+                    return;
+                  }
                   await createFolders(input);
                   toast.success("Folder created successfulyy! Wohooo!!");
                   setInput("");
                   setShowInput(false);
                   await loadFolders();
+                  const data = await fetchFolders();
+                  navigate(`/${data[0].name}/${data[0].id}`);
                 }
+
                 if (e.key === "Escape") setShowInput(false);
               }}
               className="flex-1 px-3 py-2 rounded-md bg-[var(--bg-input)] text-[var(--text-white)] text-sm outline-none"

@@ -16,9 +16,11 @@ import {
   fetchNoteById,
   updateNote,
   fetchFolders,
+  // fetchNotes,
 } from "../../../api";
 import RestoreNote from "./RestoreNote";
 import Skeleton from "../../NoteList/Skeleton";
+// import toast from "react-hot-toast";
 
 export default function NoteView() {
   const { loadNotes, setNotes } = useNotes();
@@ -50,6 +52,7 @@ export default function NoteView() {
 
     const controller = new AbortController();
     controllerRef.current = controller;
+
     async function loadNote() {
       if (!noteId) return;
 
@@ -106,8 +109,12 @@ export default function NoteView() {
     }, 1000),
     [noteId],
   );
+  // const data = loadNotes(undefined, folderId,1,10);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // if (data.some((note) => note.title === e.target.value)) {
+    //   toast.success("Note already exist, try chnaging name");
+    // }
     setTitle(e.target.value);
     autoSave(e.target.value, content);
   };

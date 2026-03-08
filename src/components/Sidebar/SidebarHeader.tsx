@@ -171,7 +171,7 @@ export default function SidebarHeader({
         rounded-lg
         bg-[var(--primary)]
         text-[var(--text-white)]
-        text-sm font-medium
+        text-md font-medium
         hover:bg-[var(--primary-hover)]
         transition
       "

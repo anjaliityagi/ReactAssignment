@@ -1,20 +1,11 @@
 import { Trash2, Star, Archive } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function SidebarMore() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleFavorites = () => {
-    navigate(`/favorites`);
-  };
-
-  const handleDeleted = () => {
-    navigate(`/trash`);
-  };
-
-  const handleArchive = () => {
-    navigate(`/archive`);
-  };
+  const isActive = (path: string) => location.pathname.startsWith(path);
 
   return (
     <div className="bottom-16 left-0 w-full pt-4 h-[20%]">
@@ -24,24 +15,42 @@ export default function SidebarMore() {
 
       <div className="flex flex-col gap-1">
         <div
-          className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-[var(--text-soft)] cursor-pointer hover:bg-[var(--bg-hover)] transition"
-          onClick={handleFavorites}
+          className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm cursor-pointer transition
+            ${
+              isActive("/favorites")
+                ? "bg-[var(--note-active-bg)] text-[var(--text-white)]"
+                : "text-[var(--text-soft)] hover:bg-[var(--bg-hover)]"
+            }
+          `}
+          onClick={() => navigate("/favorites")}
         >
           <Star size={18} />
           Favorites
         </div>
 
         <div
-          className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-[var(--text-soft)] cursor-pointer hover:bg-[var(--bg-hover)] transition"
-          onClick={handleDeleted}
+          className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm cursor-pointer transition
+            ${
+              isActive("/trash")
+                ? "bg-[var(--note-active-bg)] text-[var(--text-white)]"
+                : "text-[var(--text-soft)] hover:bg-[var(--bg-hover)]"
+            }
+          `}
+          onClick={() => navigate("/trash")}
         >
           <Trash2 size={18} />
           Trash
         </div>
 
         <div
-          className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-[var(--text-soft)] cursor-pointer hover:bg-[var(--bg-hover)] transition"
-          onClick={handleArchive}
+          className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm cursor-pointer transition
+            ${
+              isActive("/archive")
+                ? "bg-[var(--note-active-bg)] text-[var(--text-white)]"
+                : "text-[var(--text-soft)] hover:bg-[var(--bg-hover)]"
+            }
+          `}
+          onClick={() => navigate("/archive")}
         >
           <Archive size={18} />
           Archived Notes

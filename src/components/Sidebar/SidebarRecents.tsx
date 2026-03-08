@@ -71,7 +71,7 @@ export default function SidebarRecents() {
                       : "text-[var(--text-gray-400)] group-hover:text-[var(--text-gray-200)] transition"
                   }`}
                 />
-                <span className="truncate">{recent.title}</span>
+                <span className="truncate">{recent.title || "Untitled"}</span>
               </div>
             </div>
           );

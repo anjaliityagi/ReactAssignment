@@ -65,7 +65,7 @@ export default function NoteView() {
         if (err.name !== "CanceledError") {
           console.error(err);
         }
-
+      } finally {
         setLoading(false);
       }
     }

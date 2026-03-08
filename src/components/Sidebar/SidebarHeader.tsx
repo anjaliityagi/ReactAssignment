@@ -1,5 +1,5 @@
 import { useNotes } from "../../context/NotesContext";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createNote, searchNote, type Notes } from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { Plus, Search, Sun, Moon } from "lucide-react";
@@ -18,7 +18,7 @@ export default function SidebarHeader({
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState<Notes[]>([]);
   const navigate = useNavigate();
-
+  const timerRef = useRef<number | null>(null);
   const { folderName, folderId, filters } = useParams<{
     folderName: string;
     folderId: string;
@@ -38,24 +38,39 @@ export default function SidebarHeader({
     navigate(`/${folderName}/${folderId}/notes/${newNote}`);
     toast.success("Note created successfulyy!Yayyyyy!!");
   };
-
-  let timer: number;
   const searchingNotes = (value: string) => {
     setSearchQuery(value);
 
-    clearTimeout(timer);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
 
-    timer = window.setTimeout(async () => {
+    timerRef.current = window.setTimeout(async () => {
       if (value.trim()) {
         const data = await searchNote(value);
         setResult(data);
-        setShowResult(true);
       } else {
         setResult([]);
         setShowResult(false);
       }
     }, 400);
   };
+  // const searchingNotes = (value: string) => {
+  //   setSearchQuery(value);
+
+  //   clearTimeout(timer);
+
+  //   timer = window.setTimeout(async () => {
+  //     if (value.trim()) {
+  //       const data = await searchNote(value);
+  //       setResult(data);
+  //       setShowResult(true);
+  //     } else {
+  //       setResult([]);
+  //       setShowResult(false);
+  //     }
+  //   }, 400);
+  // };
   return (
     <>
       <div className="flex justify-between items-center mb-6">

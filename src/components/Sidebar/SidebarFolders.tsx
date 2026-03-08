@@ -156,6 +156,7 @@ export default function SidebarFolders() {
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={async (e) => {
                           if (e.key === "Enter") {
+                            if (!input.trim()) return;
                             await editFolder(folder.id, input);
                             setEdit(false);
                             await loadFolders();
@@ -167,6 +168,7 @@ export default function SidebarFolders() {
                             });
                           }
                           if (e.key === "Escape") setEdit(false);
+                          setInput("");
                         }}
                         onBlur={() => setEdit(false)}
                         onClick={(e) => e.stopPropagation()}

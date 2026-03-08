@@ -1,5 +1,5 @@
 import { useNotes } from "../../../context/NotesContext";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Calendar,
@@ -43,10 +43,8 @@ export default function NoteView() {
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const controllerRef = useRef<AbortController | null>(null);
-  async function loadFolders() {
-    const data = await fetchFolders();
-    setFolders(data);
-  }
+  const timeoutRef = useRef<number | null>(null);
+
   useEffect(() => {
     controllerRef.current?.abort();
 
@@ -64,8 +62,8 @@ export default function NoteView() {
         setTitle(data?.title ?? "");
         setContent(data?.content ?? "");
         setLoading(false);
-      } catch (err: any) {
-        if (err.name === "CanceledError") {
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === "CanceledError") {
           return;
         }
         setNote(null);
@@ -78,36 +76,45 @@ export default function NoteView() {
   }, [noteId]);
 
   useEffect(() => {
+    async function loadFolders() {
+      const data = await fetchFolders();
+      setFolders(data);
+    }
     loadFolders();
   }, []);
-  const autoSave = useCallback(
-    debounce(async (t: string, c: string) => {
-      if (!noteId) return;
 
+  const autoSave = (title: string, content: string) => {
+    if (!noteId) return;
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = window.setTimeout(async () => {
       setSaving(true);
-      await updateNote(noteId, { title: t, content: c });
+
+      await updateNote(noteId, { title, content });
+
       setSaving(false);
       setSaved(true);
 
-      setTimeout(() => {
-        setSaved(false);
-      }, 2000);
+      setTimeout(() => setSaved(false), 2000);
+
+      // update notes list
       setNotes((prev) =>
         prev.map((n) =>
           n.id === noteId
             ? {
                 ...n,
-                title: t,
-                content: c,
-                preview: c.slice(0, 50),
+                title,
+                preview: content.slice(0, 50),
                 updatedAt: new Date().toDateString(),
               }
             : n,
         ),
       );
-    }, 1000),
-    [noteId],
-  );
+    }, 1000);
+  };
   // const data = loadNotes(undefined, folderId,1,10);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -171,9 +178,11 @@ export default function NoteView() {
       prev ? { ...prev, isArchived: !prev.isArchived } : prev,
     );
 
-    filter
-      ? navigate(`/${filter}`)
-      : navigate(`/${note.folder.name}/${note.folderId}`);
+    if (filter) {
+      navigate(`/${filter}`);
+    } else {
+      navigate(`/${note.folder.name}/${note.folderId}`);
+    }
 
     if (filter === "archive" && wasArchived) {
       navigate("/archive");
@@ -360,13 +369,4 @@ export default function NoteView() {
       )}
     </div>
   );
-}
-
-function debounce(func: Function, wait: number) {
-  let timeout: number;
-
-  return (...args: any[]) => {
-    clearTimeout(timeout);
-    timeout = window.setTimeout(() => func(...args), wait);
-  };
 }

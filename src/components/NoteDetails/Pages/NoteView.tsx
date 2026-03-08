@@ -61,20 +61,23 @@ export default function NoteView() {
         setTitle(data?.title ?? "");
         setContent(data?.content ?? "");
       } catch (err: any) {
-        setNote(null);
         if (err.name !== "CanceledError") {
-          console.error(err);
+          return;
         }
+        console.error(err);
+        setNote(null);
       } finally {
         setLoading(false);
       }
     }
     loadNote();
-    loadFolders();
 
     return () => controller.abort();
-  }, [noteId, folderId]);
+  }, [noteId]);
 
+  useEffect(() => {
+    loadFolders();
+  }, []);
   const autoSave = useCallback(
     debounce(async (t: string, c: string) => {
       if (!noteId) return;
@@ -127,7 +130,7 @@ export default function NoteView() {
     navigate(
       filter
         ? `/${filter}/notes/${noteId}/restore`
-        : `/${note.folder.name}/${note.folder.id}/notes/${note.id}`,
+        : `/${note.folder.name}/${note.folder.id}/notes/${note.id}/restore`,
     );
 
     setConfirmDelete(false);
@@ -334,7 +337,7 @@ export default function NoteView() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setConfirmDelete(false)}
-                className="px-4 py-2 rounded-lg text-sm bg-[var(--note-bg)] hover:bg-[var(--note-hover-bg)]"
+                className="px-4 py-2 rounded-lg text-sm text-[var(--text-white)] bg-[var(--bg-hover)] hover:bg-[var(--note-hover-bg) ]"
               >
                 Cancel
               </button>

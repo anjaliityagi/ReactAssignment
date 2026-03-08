@@ -209,7 +209,7 @@ export default function SidebarFolders() {
               <button
                 onClick={async () => {
                   await delFolder(folderToDelete.id);
-                  await loadFolders();
+                  await loadFolders(folderToDelete.id);
                   toast.success("Folder deleted Successfully! Sad...");
                   // await loadFolders(folderToDelete.id);
                   setFolderToDelete(null);

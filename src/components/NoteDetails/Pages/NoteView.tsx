@@ -68,7 +68,6 @@ export default function NoteView() {
           return;
         }
         console.error(err);
-        setNote(null);
       } finally {
         setLoading(false);
       }

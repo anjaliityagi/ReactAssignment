@@ -29,11 +29,17 @@ export default function RestoreNotePage() {
     // console.log(noteId);
     setLoading(false);
 
-    navigate(
-      filter
-        ? `/${filter}/notes/${updatedNote.id}`
-        : `/${updatedNote.folder.name}/${updatedNote.folderId}/notes/${updatedNote.id}`,
-    );
+    if (filter === "favorites" || filter === "archive") {
+      navigate(`/${filter}/notes/${updatedNote.id}`);
+    } else if (filter === "trash") {
+      navigate(
+        `/${updatedNote.folder.name}/${updatedNote.folder.id}/notes/${updatedNote.id}`,
+      );
+    } else {
+      navigate(
+        `/${updatedNote.folder.name}/${updatedNote.folder.id}/notes/${updatedNote.id}`,
+      );
+    }
 
     // await navigate(`/trash`);
     // await loadNotes("trash");

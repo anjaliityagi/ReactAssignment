@@ -38,6 +38,7 @@ export default function SidebarHeader({
     navigate(`/${folderName}/${folderId}/notes/${newNote}`);
     toast.success("Note created successfulyy!Yayyyyy!!");
   };
+
   const searchingNotes = (value: string) => {
     setSearchQuery(value);
 
@@ -49,6 +50,7 @@ export default function SidebarHeader({
       if (value.trim()) {
         const data = await searchNote(value);
         setResult(data);
+        setShowResult(true);
       } else {
         setResult([]);
         setShowResult(false);

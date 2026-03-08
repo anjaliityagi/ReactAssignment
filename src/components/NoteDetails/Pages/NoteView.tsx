@@ -73,7 +73,7 @@ export default function NoteView() {
     loadNote();
 
     return () => controller.abort();
-  }, [noteId]);
+  }, [noteId, folderId]);
 
   useEffect(() => {
     async function loadFolders() {

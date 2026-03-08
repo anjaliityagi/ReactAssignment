@@ -63,13 +63,13 @@ export default function NoteView() {
         setNote(data);
         setTitle(data?.title ?? "");
         setContent(data?.content ?? "");
+        setLoading(false);
       } catch (err: any) {
-        if (err.name !== "CanceledError") {
+        if (err.name === "CanceledError") {
           return;
         }
+        setNote(null);
         console.error(err);
-      } finally {
-        setLoading(false);
       }
     }
     loadNote();

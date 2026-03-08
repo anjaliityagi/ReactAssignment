@@ -3,6 +3,7 @@ import { History } from "lucide-react";
 import { restoreNote, fetchNoteById } from "../../../api";
 import { useState } from "react";
 import { useNotes } from "../../../context/NotesContext";
+import toast from "react-hot-toast";
 
 export default function RestoreNotePage() {
   const { noteId, filter, folderId } = useParams<{
@@ -40,7 +41,7 @@ export default function RestoreNotePage() {
         `/${updatedNote.folder.name}/${updatedNote.folder.id}/notes/${updatedNote.id}`,
       );
     }
-
+    toast.success("Note restored successfulyy!!hurrayy!");
     // await navigate(`/trash`);
     // await loadNotes("trash");
     // navigate(0);

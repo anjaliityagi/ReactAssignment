@@ -20,6 +20,7 @@ import {
 } from "../../../api";
 import RestoreNote from "./RestoreNote";
 import Skeleton from "../../NoteList/Skeleton";
+import toast from "react-hot-toast";
 // import toast from "react-hot-toast";
 
 export default function NoteView() {
@@ -137,7 +138,8 @@ export default function NoteView() {
     }
 
     await deleteNote(noteId);
-    loadNotes(filter, folderId);
+    toast.success("Note deleted!!");
+    await loadNotes(filter, folderId);
 
     navigate(
       filter

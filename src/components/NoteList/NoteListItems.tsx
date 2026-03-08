@@ -97,7 +97,7 @@ export default function NotesListItems() {
                 onClick={() => navigate(`${base}/notes/${note.id}`)}
                 className={`
                   mb-4 p-5 cursor-pointer rounded-xl
-                  transition-all duration-200 
+                 
                   ${
                     isActive
                       ? "bg-[var(--note-active-bg)]"

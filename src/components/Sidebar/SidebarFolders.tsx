@@ -9,6 +9,7 @@ import {
   type Folder,
 } from "../../api";
 import Skeleton from "../NoteList/Skeleton";
+import toast from "react-hot-toast";
 
 export default function SidebarFolders() {
   const [folders, setFolders] = useState<Folder[]>([]);
@@ -77,6 +78,7 @@ export default function SidebarFolders() {
               onKeyDown={async (e) => {
                 if (e.key === "Enter" && input.trim()) {
                   await createFolders(input);
+                  toast.success("Folder created successfulyy! Wohooo!!");
                   setInput("");
                   setShowInput(false);
                   await loadFolders();
@@ -120,7 +122,7 @@ export default function SidebarFolders() {
                   className={`
               group flex justify-between items-center
               px-3 py-2 rounded-lg text-sm cursor-pointer 
-              transition-all duration-200
+              
               ${
                 isActive
                   ? "bg-[var(--folder-active-bg)] text-[var(--text-white)]"
@@ -148,6 +150,9 @@ export default function SidebarFolders() {
                             await editFolder(folder.id, input);
                             setEdit(false);
                             await loadFolders();
+                            toast.success(
+                              "FolderName Edited Successfulyy! So Nicee!!",
+                            );
                             navigate(`/${input}/${folder.id}`, {
                               replace: true,
                             });
@@ -204,7 +209,9 @@ export default function SidebarFolders() {
               <button
                 onClick={async () => {
                   await delFolder(folderToDelete.id);
-                  await loadFolders(folderToDelete.id);
+                  await loadFolders();
+                  toast.success("Folder deleted Successfully! Sad...");
+                  // await loadFolders(folderToDelete.id);
                   setFolderToDelete(null);
                 }}
                 className="px-4 py-2 rounded-md text-sm bg-[var(--danger-red)] text-white hover:opacity-90 transition"

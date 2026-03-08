@@ -4,10 +4,14 @@ import SidebarFolders from "./SidebarFolders";
 import SidebarMore from "./SidebarMore";
 import SidebarHeader from "./SidebarHeader";
 
-export default function Sidebar() {
+type SidebarProps = {
+  theme: string;
+  toggleTheme: () => void;
+};
+export default function Sidebar({ theme, toggleTheme }: SidebarProps) {
   return (
     <div className="flex flex-col h-full w-full p-2">
-      <SidebarHeader />
+      <SidebarHeader theme={theme} toggleTheme={toggleTheme} />
 
       <SidebarRecents />
 

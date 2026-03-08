@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { ThemeProvider } from "./context/ThemeContext";
+// import { ThemeProvider } from "./context/ThemeContext";
 import { NotesProvider } from "./context/NotesContext";
 
 //import App from "./App";
@@ -39,10 +39,10 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <NotesProvider>
-        <RouterProvider router={router} />
-      </NotesProvider>
-    </ThemeProvider>
+    {/* <ThemeProvider> */}
+    <NotesProvider>
+      <RouterProvider router={router} />
+    </NotesProvider>
+    {/* </ThemeProvider> */}
   </React.StrictMode>,
 );

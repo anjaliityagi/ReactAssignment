@@ -1,5 +1,5 @@
 import { useNotes } from "../../../context/NotesContext";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Calendar,
@@ -40,32 +40,39 @@ export default function NoteView() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-
-  async function loadNote() {
-    if (!noteId) return;
-
-    setLoading(true);
-
-    try {
-      const data = await fetchNoteById(noteId);
-      setNote(data);
-      setTitle(data?.title ?? "");
-      setContent(data?.content ?? "");
-    } catch {
-      setNote(null);
-    }
-
-    setLoading(false);
-  }
-
+  const controllerRef = useRef<AbortController | null>(null);
   async function loadFolders() {
     const data = await fetchFolders();
     setFolders(data);
   }
-
   useEffect(() => {
+    controllerRef.current?.abort();
+
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    async function loadNote() {
+      if (!noteId) return;
+
+      setLoading(true);
+
+      try {
+        const data = await fetchNoteById(noteId, controller.signal);
+        setNote(data);
+        setTitle(data?.title ?? "");
+        setContent(data?.content ?? "");
+      } catch (err: any) {
+        setNote(null);
+        if (err.name !== "CanceledError") {
+          console.error(err);
+        }
+
+        setLoading(false);
+      }
+    }
     loadNote();
     loadFolders();
+
+    return () => controller.abort();
   }, [noteId, folderId]);
 
   const autoSave = useCallback(

@@ -3,10 +3,17 @@ import { useState } from "react";
 import { createNote, searchNote, type Notes } from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { Plus, Search, Sun, Moon } from "lucide-react";
-import { useTheme } from "../../context/ThemeContext";
+// import { useTheme } from "../../context/ThemeContext";
 import Logo from "./Logo";
-
-export default function SidebarHeader() {
+import toast from "react-hot-toast";
+type SidebarHeaderProps = {
+  theme: string;
+  toggleTheme: () => void;
+};
+export default function SidebarHeader({
+  theme,
+  toggleTheme,
+}: SidebarHeaderProps) {
   const [showSearch, setShowSearch] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState<Notes[]>([]);
@@ -19,15 +26,17 @@ export default function SidebarHeader() {
   }>();
 
   const { searchQuery, setSearchQuery, loadNotes } = useNotes();
-  const { theme, toggleTheme } = useTheme();
+  // const { theme, toggleTheme } = useTheme();
 
   const handleCreateNote = async () => {
     if (filters) return;
     if (!folderId) return;
 
     const newNote = await createNote(folderId, "", "", false, false);
+
     await loadNotes(undefined, folderId);
     navigate(`/${folderName}/${folderId}/notes/${newNote}`);
+    toast.success("Note created successfulyy!Yayyyyy!!");
   };
 
   let timer: number;

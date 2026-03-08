@@ -128,8 +128,14 @@ export const updateNote = async (
   }
 };
 
-export const fetchNoteById = async (noteId: string): Promise<Note> => {
-  const res = await api.get<{ note: Note }>(`/notes/${noteId}`);
+export const fetchNoteById = async (
+  noteId: string,
+  signal?: AbortSignal,
+): Promise<Note> => {
+  const res = await api.get<{ note: Note }>(`/notes/${noteId}`, {
+    signal,
+  });
+
   return res.data.note;
 };
 

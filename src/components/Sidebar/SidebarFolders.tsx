@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus, FolderClosed, FolderOpen, Trash } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -24,37 +24,38 @@ export default function SidebarFolders() {
   const { folderId } = useParams<{ folderId: string }>();
   // const { folderName } = useParams<{ folderName: string }>();
   const { filter } = useParams<{ filter: string }>();
-  const loadFolders = async (deletedId?: string) => {
-    setLoading(true);
 
-    const data = await fetchFolders();
-    setFolders(data);
+  const loadFolders = useCallback(
+    async (deletedId?: string) => {
+      setLoading(true);
 
-    // if (folderName) {
-    //   navigate(`/${folderName}/${folderId}`);
-    // }
-    // if (filter) {
-    //   navigate(`/${filter}`);
-    // }
+      const data = await fetchFolders();
+      setFolders(data);
 
-    if (!folderId && !filter && data.length > 0) {
-      navigate(`/${data[0].name}/${data[0].id}`);
-    }
-
-    if (deletedId && deletedId === folderId) {
-      if (data.length > 0) {
+      if (!folderId && !filter && data.length > 0) {
         navigate(`/${data[0].name}/${data[0].id}`);
-      } else {
-        navigate("/");
       }
-    }
 
-    setLoading(false);
-  };
+      if (deletedId && deletedId === folderId) {
+        if (data.length > 0) {
+          navigate(`/${data[0].name}/${data[0].id}`);
+        } else {
+          navigate("/");
+        }
+      }
+
+      setLoading(false);
+    },
+    [folderId, filter, navigate],
+  );
 
   useEffect(() => {
-    loadFolders();
-  }, []);
+    async function init() {
+      await loadFolders();
+    }
+
+    init();
+  }, [loadFolders]);
 
   return (
     <>

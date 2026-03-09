@@ -1,11 +1,13 @@
 /* eslint-disable */
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import {
   fetchArchive,
   fetchDeleted,
   fetchFav,
   fetchNotes,
   type Notes,
+  fetchRecents,
+  type RecentNotes,
 } from "../api";
 
 type Filter = "favorites" | "trash" | "archive";
@@ -22,6 +24,9 @@ type NotesContextType = {
     append?: boolean,
   ) => Promise<Notes[]>;
   listLoading: boolean;
+  loadRecents: () => Promise<void>;
+  loading: boolean;
+  recentNotes: RecentNotes[];
   setNotes: React.Dispatch<React.SetStateAction<Notes[]>>;
 };
 
@@ -31,37 +36,49 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
   const [notes, setNotes] = useState<Notes[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [listLoading, setListLoading] = useState(false);
+  const [recentNotes, setRecentNotes] = useState<RecentNotes[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const loadNotes = async (
-    filter?: Filter,
-    folderId?: string,
-    page: number = 1,
-    limit: number = 10,
-    append: boolean = false,
-  ) => {
-    setListLoading(true);
+  const loadRecents = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchRecents();
+    setRecentNotes(data);
+    setLoading(false);
+  }, []);
 
-    let data: Notes[] = [];
+  const loadNotes = useCallback(
+    async (
+      filter?: Filter,
+      folderId?: string,
+      page: number = 1,
+      limit: number = 10,
+      append: boolean = false,
+    ) => {
+      setListLoading(true);
 
-    if (filter === "favorites") {
-      data = await fetchFav(true, page, limit);
-    } else if (filter === "archive") {
-      data = await fetchArchive(true, page, limit);
-    } else if (filter === "trash") {
-      data = await fetchDeleted(true, page, limit);
-    } else if (folderId) {
-      data = await fetchNotes(folderId, page, limit);
-    }
+      let data: Notes[] = [];
 
-    if (append) {
-      setNotes((prev) => [...prev, ...data]);
-    } else {
-      setNotes(data);
-    }
+      if (filter === "favorites") {
+        data = await fetchFav(true, page, limit);
+      } else if (filter === "archive") {
+        data = await fetchArchive(true, page, limit);
+      } else if (filter === "trash") {
+        data = await fetchDeleted(true, page, limit);
+      } else if (folderId) {
+        data = await fetchNotes(folderId, page, limit);
+      }
 
-    setListLoading(false);
-    return data;
-  };
+      if (append) {
+        setNotes((prev) => [...prev, ...data]);
+      } else {
+        setNotes(data);
+      }
+
+      setListLoading(false);
+      return data;
+    },
+    [],
+  );
 
   return (
     <NotesContext.Provider
@@ -72,6 +89,10 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
         loadNotes,
         listLoading,
         setNotes,
+        loadRecents,
+        loading,
+
+        recentNotes,
       }}
     >
       {children}

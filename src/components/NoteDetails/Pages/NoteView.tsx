@@ -24,7 +24,7 @@ import toast from "react-hot-toast";
 // import toast from "react-hot-toast";
 
 export default function NoteView() {
-  const { loadNotes, setNotes } = useNotes();
+  const { loadNotes, setNotes, loadRecents } = useNotes();
   const navigate = useNavigate();
 
   const { noteId, filter, folderId } = useParams<{
@@ -98,8 +98,8 @@ export default function NoteView() {
 
       setSaving(false);
       setSaved(true);
-
-      setTimeout(() => setSaved(false), 2000);
+      loadRecents();
+      setTimeout(() => setSaved(false), 3000);
 
       setNotes((prev) =>
         prev.map((n) =>
@@ -113,7 +113,7 @@ export default function NoteView() {
             : n,
         ),
       );
-    }, 1000);
+    }, 500);
   };
   // const data = loadNotes(undefined, folderId,1,10);
 
@@ -139,15 +139,15 @@ export default function NoteView() {
 
     await deleteNote(noteId);
     toast.success("Note deleted!!");
+    setConfirmDelete(false);
     await loadNotes(filter, folderId);
 
     navigate(
       filter
         ? `/${filter}/notes/${noteId}/restore`
         : `/${note.folder.name}/${note.folder.id}/notes/${note.id}/restore`,
+      { state: { title: note.title } },
     );
-
-    setConfirmDelete(false);
   };
 
   const toggleFavorite = async () => {

@@ -94,7 +94,11 @@ export default function NotesListItems() {
             return (
               <div
                 key={note.id}
-                onClick={() => navigate(`${base}/notes/${note.id}`)}
+                onClick={() =>
+                  navigate(`${base}/notes/${note.id}`, {
+                    state: { title: note.title },
+                  })
+                }
                 className={`
                   mb-4 p-5 cursor-pointer rounded-xl
                  

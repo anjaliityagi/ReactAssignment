@@ -72,7 +72,7 @@ export const editFolder = async (id: string, name: string) => {
   console.log(res.data);
 };
 export const delFolder = async (id: string) => {
-  const res = await api.delete(`/folders/${id}`);
+  const res = await api.delete<{ folder: Folder }>(`/folders/${id}`);
   console.log(res.data);
 };
 
@@ -99,7 +99,7 @@ export const createNote = async (
   isArchived: false,
   isFavorite: false,
 ): Promise<Note> => {
-  const res = await api.post("/notes", {
+  const res = await api.post<{ id: Note }>("/notes", {
     folderId,
     title,
     content,

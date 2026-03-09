@@ -51,8 +51,8 @@ export default function SidebarFolders() {
     async function init() {
       await loadFolders();
     }
-
     init();
+    // loadFolders()
   }, [loadFolders]);
 
   return (
@@ -79,7 +79,8 @@ export default function SidebarFolders() {
                   if (
                     folders.some(
                       (folder) =>
-                        folder.name.toLowerCase() === input.toLowerCase(),
+                        folder.name.toLowerCase().trim() ===
+                        input.toLowerCase().trim(),
                     )
                   ) {
                     toast.success(
@@ -161,6 +162,18 @@ export default function SidebarFolders() {
                         onKeyDown={async (e) => {
                           if (e.key === "Enter") {
                             if (!input.trim()) return;
+                            if (
+                              folders.some(
+                                (f) =>
+                                  f.name.toLowerCase().trim() ===
+                                    input.toLowerCase().trim() &&
+                                  f.id !== folder.id,
+                              )
+                            ) {
+                              toast.error("Folder already exists");
+                              return;
+                            }
+
                             await editFolder(folder.id, input);
                             setEdit(false);
                             await loadFolders();
@@ -171,8 +184,10 @@ export default function SidebarFolders() {
                               replace: true,
                             });
                           }
-                          if (e.key === "Escape") setEdit(false);
-                          setInput("");
+                          if (e.key === "Escape") {
+                            setEdit(false);
+                            setInput("");
+                          }
                         }}
                         onBlur={() => setEdit(false)}
                         onClick={(e) => e.stopPropagation()}

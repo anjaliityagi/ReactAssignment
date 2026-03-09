@@ -113,7 +113,7 @@ export default function NoteView() {
             : n,
         ),
       );
-    }, 500);
+    }, 1000);
   };
   // const data = loadNotes(undefined, folderId,1,10);
 

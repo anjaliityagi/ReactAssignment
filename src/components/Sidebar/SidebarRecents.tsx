@@ -1,18 +1,19 @@
 import { FileText } from "lucide-react";
 import { useEffect } from "react";
 import { type Notes } from "../../api";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Skeleton from "../NoteList/Skeleton";
 import { useNotes } from "../../context/NotesContext";
 
 export default function SidebarRecents() {
-  const { noteId } = useParams<{ noteId: string }>();
+  // const { noteId } = useParams<{ noteId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { loadRecents, loading, recentNotes } = useNotes();
+
   useEffect(() => {
     loadRecents();
-  }, [noteId, loadRecents]);
+  }, [loadRecents]);
 
   const handleRecentNote = (note: Notes) => {
     navigate(`/${note.folder.name}/${note.folderId}/notes/${note.id}`);

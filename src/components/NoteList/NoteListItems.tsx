@@ -37,7 +37,7 @@ export default function NotesListItems() {
     };
 
     fetchData();
-  }, [folderId, filter]);
+  }, [folderId, filter, loadNotes]);
 
   useEffect(() => {
     if (loading) return;
@@ -62,7 +62,7 @@ export default function NotesListItems() {
     if (current) observer.observe(current);
 
     return () => observer.disconnect();
-  }, [page, loadingMore, hasMore, loading, folderId, filter]);
+  }, [page, loadingMore, hasMore, loading, folderId, filter, loadNotes]);
 
   return (
     <div className="flex flex-col h-full">

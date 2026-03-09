@@ -24,7 +24,20 @@ export default function NotesListItems() {
   const [hasMore, setHasMore] = useState(true);
 
   const limit = 10;
+  /*useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setPage(1);
 
+      const data = await loadNotes(filter, folderId, 1, limit, false);
+
+      setLoading(false);
+      setHasMore(data.length === limit);
+    };
+
+    fetchData();
+  }, [folderId, filter, loadNotes]);
+*/
   useEffect(() => {
     let cancel = false;
     const fetchData = async () => {
@@ -39,10 +52,10 @@ export default function NotesListItems() {
         limit,
         false,
       );
-      // if(!cancel){
+      if (!cancel) {
+        setLoading(false);
+      }
 
-      // }
-      setLoading(false);
       setHasMore(data.length === limit);
     };
 
@@ -51,6 +64,31 @@ export default function NotesListItems() {
       cancel = true;
     };
   }, [folderId, filter, loadNotes]);
+
+  // useEffect(() => {
+  //   if (loading) return;
+
+  //   const observer = new IntersectionObserver(
+  //     async ([entry]) => {
+  //       if (entry.isIntersecting && !loadingMore && hasMore) {
+  //         setLoadingMore(true);
+
+  //         const nextPage = page + 1;
+  //         const data = await loadNotes( filter, folderId, nextPage, limit, true);
+
+  //         setPage(nextPage);
+  //         setHasMore(data.length === limit);
+  //         setLoadingMore(false);
+  //       }
+  //     },
+  //     { rootMargin: "500px" },
+  //   );
+
+  //   const current = observerRef.current;
+  //   if (current) observer.observe(current);
+
+  //   return () => observer.disconnect();
+  // }, [page, loadingMore, hasMore, loading, folderId, filter, loadNotes]);
 
   // useEffect(() => {
   //   let cancel = false;
@@ -73,7 +111,7 @@ export default function NotesListItems() {
 
   useEffect(() => {
     if (loading) return;
-    if (page === 1) return;
+
     console.log("new");
 
     const observer = new IntersectionObserver(

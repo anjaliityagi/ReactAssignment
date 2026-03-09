@@ -73,12 +73,13 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
       if (!cancel()) {
         if (append) {
           setNotes((prev) => [...prev, ...data]);
+          setListLoading(false);
         } else {
           setNotes(data);
+          setListLoading(false);
         }
       }
 
-      setListLoading(false);
       return data;
     },
     [],

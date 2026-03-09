@@ -34,7 +34,7 @@ export default function SidebarHeader({
 
     const newNote = await createNote(folderId, "", "", false, false);
 
-    await loadNotes(undefined, folderId);
+    await loadNotes(() => false, undefined, folderId);
     navigate(`/${folderName}/${folderId}/notes/${newNote}`);
     toast.success("Note created successfulyy!Yayyyyy!!");
   };

@@ -17,6 +17,7 @@ type NotesContextType = {
   searchQuery: string;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
   loadNotes: (
+    cancel: () => boolean,
     filter?: Filter,
     folderId?: string,
     page?: number,
@@ -48,6 +49,7 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
 
   const loadNotes = useCallback(
     async (
+      cancel: () => boolean,
       filter?: Filter,
       folderId?: string,
       page: number = 1,
@@ -68,10 +70,12 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
         data = await fetchNotes(folderId, page, limit);
       }
 
-      if (append) {
-        setNotes((prev) => [...prev, ...data]);
-      } else {
-        setNotes(data);
+      if (!cancel()) {
+        if (append) {
+          setNotes((prev) => [...prev, ...data]);
+        } else {
+          setNotes(data);
+        }
       }
 
       setListLoading(false);
@@ -91,7 +95,6 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
         setNotes,
         loadRecents,
         loading,
-
         recentNotes,
       }}
     >

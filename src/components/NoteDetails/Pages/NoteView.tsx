@@ -43,37 +43,56 @@ export default function NoteView() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const controllerRef = useRef<AbortController | null>(null);
+  // const controllerRef = useRef<AbortController | null>(null);
   const timeoutRef = useRef<number | null>(null);
 
+  // useEffect(() => {
+  //   controllerRef.current?.abort();
+
+  //   const controller = new AbortController();
+  //   controllerRef.current = controller;
+
+  //   async function loadNote() {
+  //     if (!noteId) return;
+
+  //     setLoading(true);
+
+  //     try {
+  //       const data = await fetchNoteById(noteId, controller.signal);
+  //       setNote(data);
+  //       setTitle(data?.title ?? "");
+  //       setContent(data?.content ?? "");
+  //       setLoading(false);
+  //     } catch (err: unknown) {
+  //       if (err instanceof Error && err.name === "CanceledError") {
+  //         return;
+  //       }
+  //       setNote(null);
+  //       console.error(err);
+  //     }
+  //   }
+  //   loadNote();
+
+  //   return () => controller.abort();
+  // }, [noteId, folderId]);
+
   useEffect(() => {
-    controllerRef.current?.abort();
-
-    const controller = new AbortController();
-    controllerRef.current = controller;
-
+    let cancel = false;
     async function loadNote() {
       if (!noteId) return;
-
       setLoading(true);
-
-      try {
-        const data = await fetchNoteById(noteId, controller.signal);
+      const data = await fetchNoteById(noteId);
+      if (!cancel) {
         setNote(data);
         setTitle(data?.title ?? "");
         setContent(data?.content ?? "");
         setLoading(false);
-      } catch (err: unknown) {
-        if (err instanceof Error && err.name === "CanceledError") {
-          return;
-        }
-        setNote(null);
-        console.error(err);
       }
     }
     loadNote();
-
-    return () => controller.abort();
+    return () => {
+      cancel = true;
+    };
   }, [noteId, folderId]);
 
   useEffect(() => {
@@ -140,7 +159,7 @@ export default function NoteView() {
     await deleteNote(noteId);
     toast.success("Note deleted!!");
     setConfirmDelete(false);
-    await loadNotes(filter, folderId);
+    await loadNotes(() => false, filter, folderId);
 
     navigate(
       filter
@@ -156,7 +175,7 @@ export default function NoteView() {
     const wasFavorite = note.isFavorite;
     setMenuOpen(false);
     await updateNote(noteId, { isFavorite: !note.isFavorite });
-    await loadNotes(filter, folderId);
+    await loadNotes(() => false, filter, folderId);
 
     setNote((prev) =>
       prev ? { ...prev, isFavorite: !prev.isFavorite } : prev,
@@ -173,7 +192,7 @@ export default function NoteView() {
     const wasArchived = note.isArchived;
     setMenuOpen(false);
     await updateNote(noteId, { isArchived: !note.isArchived });
-    await loadNotes(filter, folderId);
+    await loadNotes(() => false, filter, folderId);
 
     setNote((prev) =>
       prev ? { ...prev, isArchived: !prev.isArchived } : prev,

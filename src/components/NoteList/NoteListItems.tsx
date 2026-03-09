@@ -26,21 +26,55 @@ export default function NotesListItems() {
   const limit = 10;
 
   useEffect(() => {
+    let cancel = false;
     const fetchData = async () => {
       setLoading(true);
       setPage(1);
+      // console.log("HIHIHI");
+      const data = await loadNotes(
+        () => cancel,
+        filter,
+        folderId,
+        1,
+        limit,
+        false,
+      );
+      // if(!cancel){
 
-      const data = await loadNotes(filter, folderId, 1, limit, false);
-
+      // }
       setLoading(false);
       setHasMore(data.length === limit);
     };
 
     fetchData();
+    return () => {
+      cancel = true;
+    };
   }, [folderId, filter, loadNotes]);
+
+  // useEffect(() => {
+  //   let cancel = false;
+  //   async function loadNote() {
+  //     if (!folderId) return;
+  //     setLoading(true);
+  //     const data = await fetchNotes(folderId, 1, 10);
+  //     if (!cancel) {
+  //       setNote(data);
+  //       setTitle(data?.title ?? "");
+  //       setContent(data?.content ?? "");
+  //       setLoading(false);
+  //     }
+  //   }
+  //   loadNote();
+  //   return () => {
+  //     cancel = true;
+  //   };
+  // }, [noteId, folderId]);
 
   useEffect(() => {
     if (loading) return;
+    if (page === 1) return;
+    console.log("new");
 
     const observer = new IntersectionObserver(
       async ([entry]) => {
@@ -48,7 +82,14 @@ export default function NotesListItems() {
           setLoadingMore(true);
 
           const nextPage = page + 1;
-          const data = await loadNotes(filter, folderId, nextPage, limit, true);
+          const data = await loadNotes(
+            () => false,
+            filter,
+            folderId,
+            nextPage,
+            limit,
+            true,
+          );
 
           setPage(nextPage);
           setHasMore(data.length === limit);

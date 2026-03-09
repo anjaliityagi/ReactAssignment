@@ -22,7 +22,7 @@ export default function RestoreNotePage() {
     setLoading(true);
     // console.log(noteId);
     await restoreNote(noteId);
-    await loadNotes(filter, folderId);
+    await loadNotes(() => false, filter, folderId);
     const updatedNote = await fetchNoteById(noteId);
 
     // console.log(updatedNote.id);

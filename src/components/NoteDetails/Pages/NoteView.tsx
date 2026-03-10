@@ -18,12 +18,12 @@ import {
   fetchFolders,
   // fetchNotes,
 } from "../../../api";
-import RestoreNote from "./RestoreNote";
-import Skeleton from "../../NoteList/Skeleton";
+import { Skeleton } from "../../NoteList/Skeleton";
 import toast from "react-hot-toast";
+import { RestoreNote } from "./RestoreNote";
 // import toast from "react-hot-toast";
 
-export default function NoteView() {
+export function NoteView() {
   const { loadNotes, setNotes, loadRecents } = useNotes();
   const navigate = useNavigate();
 

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useNotes } from "../../../context/NotesContext";
 import toast from "react-hot-toast";
 
-export default function RestoreNotePage() {
+export function RestoreNote() {
   const { noteId, filter, folderId } = useParams<{
     noteId: string;
     filter?: "favorites" | "trash" | "archive";

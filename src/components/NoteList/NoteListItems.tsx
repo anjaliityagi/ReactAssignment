@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useNotes } from "../../context/NotesContext";
-import Skeleton from "./Skeleton";
+import { Skeleton } from "./Skeleton";
 
 type filterType = "favorites" | "trash" | "archive";
 
-export default function NotesListItems() {
+export function NotesListItems() {
   const navigate = useNavigate();
   const location = useLocation();
   const { notes, loadNotes } = useNotes();

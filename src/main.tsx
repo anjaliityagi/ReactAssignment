@@ -5,13 +5,13 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { NotesProvider } from "./context/NotesContext";
 
 //import App from "./App";
-import EmptyNote from "./components/NoteDetails/Pages/EmptyNote";
-import NoteView from "./components/NoteDetails/Pages/NoteView";
+import { EmptyNote } from "./components/NoteDetails/Pages/EmptyNote";
+import { NoteView } from "./components/NoteDetails/Pages/NoteView";
 import "./index.css";
-import RestoreNote from "./components/NoteDetails/Pages/RestoreNote";
+import { RestoreNote } from "./components/NoteDetails/Pages/RestoreNote";
 // import SidebarMore from "./components/Sidebar/SidebarMore";
 // import NotesListItems from "./components/NoteList/NoteListItems";
-import MainLayout from "./layout/MainLayout";
+import { MainLayout } from "./layout/MainLayout";
 const router = createBrowserRouter([
   {
     path: "/",

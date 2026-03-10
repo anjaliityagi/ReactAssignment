@@ -1,7 +1,7 @@
 import { Trash2, Star, Archive } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-export default function SidebarMore() {
+export function SidebarMore() {
   const navigate = useNavigate();
   const location = useLocation();
 

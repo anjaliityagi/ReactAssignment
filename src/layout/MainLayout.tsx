@@ -1,10 +1,10 @@
-import Sidebar from "../components/Sidebar/Sidebar";
-import NoteListItems from "../components/NoteList/NoteListItems";
+import { Sidebar } from "../components/Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
 // import { useTheme } from "../context/ThemeContext";
 import { Toaster } from "react-hot-toast";
-export default function MainLayout() {
+import { NotesListItems } from "../components/NoteList/NoteListItems";
+export function MainLayout() {
   // let th = localStorage.getItem("theme") || "light";
   // if (th !== "dark" && th !== "light") {
   //   th = "light";
@@ -46,7 +46,7 @@ export default function MainLayout() {
         </div>
 
         <div className="w-1/4 bg-[var(--bg-notes)] border-r border-[var(--border-color)]">
-          <NoteListItems />
+          <NotesListItems />
         </div>
 
         <div className="flex-1 overflow-hidden w-[55%]">

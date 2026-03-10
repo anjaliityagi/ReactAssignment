@@ -8,10 +8,10 @@ import {
   fetchFolders,
   type Folder,
 } from "../../api";
-import Skeleton from "../NoteList/Skeleton";
+import { Skeleton } from "../NoteList/Skeleton";
 import toast from "react-hot-toast";
 
-export default function SidebarFolders() {
+export function SidebarFolders() {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [showInput, setShowInput] = useState(false);
   const [input, setInput] = useState("");

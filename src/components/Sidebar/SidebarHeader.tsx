@@ -4,16 +4,13 @@ import { createNote, searchNote, type Notes } from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { Plus, Search, Sun, Moon } from "lucide-react";
 // import { useTheme } from "../../context/ThemeContext";
-import Logo from "./Logo";
+import { Logo } from "./Logo";
 import toast from "react-hot-toast";
 type SidebarHeaderProps = {
   theme: string;
   toggleTheme: () => void;
 };
-export default function SidebarHeader({
-  theme,
-  toggleTheme,
-}: SidebarHeaderProps) {
+export function SidebarHeader({ theme, toggleTheme }: SidebarHeaderProps) {
   const [showSearch, setShowSearch] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState<Notes[]>([]);

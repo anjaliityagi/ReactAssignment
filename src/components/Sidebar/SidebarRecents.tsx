@@ -2,10 +2,10 @@ import { FileText } from "lucide-react";
 import { useEffect } from "react";
 import { type Notes } from "../../api";
 import { useNavigate, useLocation } from "react-router-dom";
-import Skeleton from "../NoteList/Skeleton";
+import { Skeleton } from "../NoteList/Skeleton";
 import { useNotes } from "../../context/NotesContext";
 
-export default function SidebarRecents() {
+export function SidebarRecents() {
   // const { noteId } = useParams<{ noteId: string }>();
   const navigate = useNavigate();
   const location = useLocation();

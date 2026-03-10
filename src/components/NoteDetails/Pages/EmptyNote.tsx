@@ -1,6 +1,6 @@
 import { FileText } from "lucide-react";
 
-export default function EmptyNote() {
+export function EmptyNote() {
   return (
     <div className="flex flex-1 h-full w-full items-center justify-center px-6">
       <div className="max-w-lg w-full text-center">

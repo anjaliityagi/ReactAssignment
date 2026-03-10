@@ -13,6 +13,7 @@ import { RestoreNote } from "./components/NoteDetails/Pages/RestoreNote";
 // import NotesListItems from "./components/NoteList/NoteListItems";
 // import { MainLayout } from "./layout/MainLayout";
 import { App } from "./App";
+import { NotFound } from "./components/NotFound";
 // import { MainLayout } from "./layout/MainLayout";
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
         ],
       },
     ],
+  },
+  {
+    path: "/*",
+    element: <NotFound />,
   },
 ]);
 

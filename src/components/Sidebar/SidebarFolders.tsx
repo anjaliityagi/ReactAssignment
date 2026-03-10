@@ -132,7 +132,9 @@ export function SidebarFolders() {
                     setEditIndex(folder.id);
                     setInput(folder.name);
                   }}
-                  onClick={() => navigate(`/${folder.name}/${folder.id}`)}
+                  onClick={() =>
+                    navigate(`/${encodeURIComponent(folder.name)}/${folder.id}`)
+                  }
                   className={`
               group flex justify-between items-center
               px-3 py-2 rounded-lg text-sm cursor-pointer 

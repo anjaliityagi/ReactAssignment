@@ -146,7 +146,7 @@ export function NotesListItems() {
   return (
     <div className="flex flex-col h-full">
       <div className="text-[28px] font-semibold text-[var(--text-white)] px-4 py-3 border-b border-[var(--border-gray-800)] truncate capitalize">
-        {filter ? filter : folderName}
+        {filter ? filter : decodeURIComponent(folderName || "")}
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-3 scrollbar-hide">

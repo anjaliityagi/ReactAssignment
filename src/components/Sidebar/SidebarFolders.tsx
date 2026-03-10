@@ -22,7 +22,6 @@ export function SidebarFolders() {
 
   const navigate = useNavigate();
   const { folderId } = useParams<{ folderId: string }>();
-  // const { folderName } = useParams<{ folderName: string }>();
   const { filter } = useParams<{ filter: string }>();
 
   const loadFolders = useCallback(
@@ -52,7 +51,6 @@ export function SidebarFolders() {
       await loadFolders();
     }
     init();
-    // loadFolders()
   }, [loadFolders]);
 
   return (
@@ -243,7 +241,6 @@ export function SidebarFolders() {
                   await delFolder(folderToDelete.id);
                   await loadFolders(folderToDelete.id);
                   toast.success("Folder deleted Successfully! Sad...");
-                  // await loadFolders(folderToDelete.id);
                   setFolderToDelete(null);
                 }}
                 className="px-4 py-2 rounded-md text-sm bg-[var(--danger-red)] text-white hover:opacity-90 transition"

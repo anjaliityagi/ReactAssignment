@@ -16,12 +16,10 @@ import {
   fetchNoteById,
   updateNote,
   fetchFolders,
-  // fetchNotes,
 } from "../../../api";
 import { Skeleton } from "../../NoteList/Skeleton";
 import toast from "react-hot-toast";
 import { RestoreNote } from "./RestoreNote";
-// import toast from "react-hot-toast";
 
 export function NoteView() {
   const { loadNotes, setNotes, loadRecents } = useNotes();
@@ -43,38 +41,7 @@ export function NoteView() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  // const controllerRef = useRef<AbortController | null>(null);
   const timeoutRef = useRef<number | null>(null);
-
-  // useEffect(() => {
-  //   controllerRef.current?.abort();
-
-  //   const controller = new AbortController();
-  //   controllerRef.current = controller;
-
-  //   async function loadNote() {
-  //     if (!noteId) return;
-
-  //     setLoading(true);
-
-  //     try {
-  //       const data = await fetchNoteById(noteId, controller.signal);
-  //       setNote(data);
-  //       setTitle(data?.title ?? "");
-  //       setContent(data?.content ?? "");
-  //       setLoading(false);
-  //     } catch (err: unknown) {
-  //       if (err instanceof Error && err.name === "CanceledError") {
-  //         return;
-  //       }
-  //       setNote(null);
-  //       console.error(err);
-  //     }
-  //   }
-  //   loadNote();
-
-  //   return () => controller.abort();
-  // }, [noteId, folderId]);
 
   useEffect(() => {
     let cancel = false;
@@ -134,12 +101,8 @@ export function NoteView() {
       );
     }, 1000);
   };
-  // const data = loadNotes(undefined, folderId,1,10);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // if (data.some((note) => note.title === e.target.value)) {
-    //   toast.success("Note already exist, try chnaging name");
-    // }
     setTitle(e.target.value);
     autoSave(e.target.value, content);
   };
@@ -220,8 +183,6 @@ export function NoteView() {
       </div>
     );
   }
-
-  // console.log("NOte: " + note?.deletedAt);
 
   if (!note)
     return (
@@ -321,10 +282,7 @@ export function NoteView() {
                     await updateNote(note.id, {
                       folderId: folder.id,
                     });
-                    // const updatedNote = await fetchNoteById(note.id);
-                    // setNote(updatedNote);
 
-                    // fetchNoteById(folder.id);
                     navigate(`/${folder.name}/${folder.id}/notes/${note.id}`);
                     setFolderMenu(false);
                   }}

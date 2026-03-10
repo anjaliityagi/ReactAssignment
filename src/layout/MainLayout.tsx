@@ -1,15 +1,9 @@
 import { Sidebar } from "../components/Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
-// import { useTheme } from "../context/ThemeContext";
 import { Toaster } from "react-hot-toast";
 import { NotesListItems } from "../components/NoteList/NoteListItems";
 export function MainLayout() {
-  // let th = localStorage.getItem("theme") || "light";
-  // if (th !== "dark" && th !== "light") {
-  //   th = "light";
-  // }
-  // const [theme, setTheme] = useState(th);
   const [theme, setTheme] = useState(() => {
     const th = localStorage.getItem("theme");
     return th === "dark" ? "dark" : "light";

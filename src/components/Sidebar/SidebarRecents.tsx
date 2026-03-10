@@ -6,7 +6,6 @@ import { Skeleton } from "../NoteList/Skeleton";
 import { useNotes } from "../../context/NotesContext";
 
 export function SidebarRecents() {
-  // const { noteId } = useParams<{ noteId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { loadRecents, loading, recentNotes } = useNotes();

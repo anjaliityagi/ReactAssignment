@@ -20,14 +20,10 @@ export function RestoreNote() {
   const handleRestore = async () => {
     if (!noteId) return;
     setLoading(true);
-    // console.log(noteId);
     await restoreNote(noteId);
     await loadNotes(() => false, filter, folderId);
     const updatedNote = await fetchNoteById(noteId);
 
-    // console.log(updatedNote.id);
-    // console.log(updatedNote.deletedAt);
-    // console.log(noteId);
     setLoading(false);
 
     if (filter === "favorites" || filter === "archive") {
@@ -42,9 +38,6 @@ export function RestoreNote() {
       );
     }
     toast.success("Note restored successfulyy!!hurrayy!");
-    // await navigate(`/trash`);
-    // await loadNotes("trash");
-    // navigate(0);
   };
 
   return (

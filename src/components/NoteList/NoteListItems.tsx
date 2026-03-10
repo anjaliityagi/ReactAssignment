@@ -24,26 +24,12 @@ export function NotesListItems() {
   const [hasMore, setHasMore] = useState(true);
 
   const limit = 10;
-  /*useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setPage(1);
 
-      const data = await loadNotes(filter, folderId, 1, limit, false);
-
-      setLoading(false);
-      setHasMore(data.length === limit);
-    };
-
-    fetchData();
-  }, [folderId, filter, loadNotes]);
-*/
   useEffect(() => {
     let cancel = false;
     const fetchData = async () => {
       setLoading(true);
       setPage(1);
-      // console.log("HIHIHI");
       const data = await loadNotes(
         () => cancel,
         filter,
@@ -64,50 +50,6 @@ export function NotesListItems() {
       cancel = true;
     };
   }, [folderId, filter, loadNotes]);
-
-  // useEffect(() => {
-  //   if (loading) return;
-
-  //   const observer = new IntersectionObserver(
-  //     async ([entry]) => {
-  //       if (entry.isIntersecting && !loadingMore && hasMore) {
-  //         setLoadingMore(true);
-
-  //         const nextPage = page + 1;
-  //         const data = await loadNotes( filter, folderId, nextPage, limit, true);
-
-  //         setPage(nextPage);
-  //         setHasMore(data.length === limit);
-  //         setLoadingMore(false);
-  //       }
-  //     },
-  //     { rootMargin: "500px" },
-  //   );
-
-  //   const current = observerRef.current;
-  //   if (current) observer.observe(current);
-
-  //   return () => observer.disconnect();
-  // }, [page, loadingMore, hasMore, loading, folderId, filter, loadNotes]);
-
-  // useEffect(() => {
-  //   let cancel = false;
-  //   async function loadNote() {
-  //     if (!folderId) return;
-  //     setLoading(true);
-  //     const data = await fetchNotes(folderId, 1, 10);
-  //     if (!cancel) {
-  //       setNote(data);
-  //       setTitle(data?.title ?? "");
-  //       setContent(data?.content ?? "");
-  //       setLoading(false);
-  //     }
-  //   }
-  //   loadNote();
-  //   return () => {
-  //     cancel = true;
-  //   };
-  // }, [noteId, folderId]);
 
   useEffect(() => {
     if (loading) return;

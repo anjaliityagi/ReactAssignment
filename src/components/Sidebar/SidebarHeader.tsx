@@ -3,7 +3,6 @@ import { useState, useRef } from "react";
 import { createNote, searchNote, type Notes } from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { Plus, Search, Sun, Moon } from "lucide-react";
-// import { useTheme } from "../../context/ThemeContext";
 import { Logo } from "./Logo";
 import toast from "react-hot-toast";
 type SidebarHeaderProps = {
@@ -23,7 +22,6 @@ export function SidebarHeader({ theme, toggleTheme }: SidebarHeaderProps) {
   }>();
 
   const { searchQuery, setSearchQuery, loadNotes } = useNotes();
-  // const { theme, toggleTheme } = useTheme();
 
   const handleCreateNote = async () => {
     if (filters) return;
@@ -54,22 +52,7 @@ export function SidebarHeader({ theme, toggleTheme }: SidebarHeaderProps) {
       }
     }, 400);
   };
-  // const searchingNotes = (value: string) => {
-  //   setSearchQuery(value);
 
-  //   clearTimeout(timer);
-
-  //   timer = window.setTimeout(async () => {
-  //     if (value.trim()) {
-  //       const data = await searchNote(value);
-  //       setResult(data);
-  //       setShowResult(true);
-  //     } else {
-  //       setResult([]);
-  //       setShowResult(false);
-  //     }
-  //   }, 400);
-  // };
   return (
     <>
       <div className="flex justify-between items-center mb-6">

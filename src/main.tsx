@@ -11,11 +11,13 @@ import "./index.css";
 import { RestoreNote } from "./components/NoteDetails/Pages/RestoreNote";
 // import SidebarMore from "./components/Sidebar/SidebarMore";
 // import NotesListItems from "./components/NoteList/NoteListItems";
-import { MainLayout } from "./layout/MainLayout";
+// import { MainLayout } from "./layout/MainLayout";
+import { App } from "./App";
+// import { MainLayout } from "./layout/MainLayout";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />,
+    element: <App />,
     children: [
       {
         path: ":filter",

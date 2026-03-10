@@ -187,7 +187,7 @@ export const fetchDeleted = async (
   return res.data.notes;
 };
 export const deleteNote = async (noteId: string) => {
-  await api.delete(`notes/${noteId}`);
+  await api.delete(`notes/${encodeURIComponent(noteId)}`);
   // console.log(res.data);
 };
 

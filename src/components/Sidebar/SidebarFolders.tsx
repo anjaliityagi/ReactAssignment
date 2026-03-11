@@ -53,6 +53,63 @@ export function SidebarFolders() {
     init();
   }, [loadFolders]);
 
+  const handleCreateFolder = async (
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (e.key === "Enter" && input.trim()) {
+      if (
+        folders.some(
+          (folder) =>
+            folder.name.toLowerCase().trim() === input.toLowerCase().trim(),
+        )
+      ) {
+        toast.success("this folder already exist, give another name");
+        return;
+      }
+      await createFolders(input);
+      toast.success("Folder created successfulyy! Wohooo!!");
+      setInput("");
+      setShowInput(false);
+      await loadFolders();
+      const data = await fetchFolders();
+      navigate(`/${data[0].name}/${data[0].id}`);
+    }
+
+    if (e.key === "Escape") {
+      setShowInput(false);
+    }
+  };
+  const handleEditingFolder = async (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    folder: Folder,
+  ) => {
+    if (e.key === "Enter") {
+      if (!input.trim()) return;
+      if (
+        folders.some(
+          (f) =>
+            f.name.toLowerCase().trim() === input.toLowerCase().trim() &&
+            f.id !== folder.id,
+        )
+      ) {
+        toast.error("Folder already exists");
+        return;
+      }
+
+      await editFolder(folder.id, input);
+      setEdit(false);
+      await loadFolders();
+      toast.success("FolderName Edited Successfulyy! So Nicee!!");
+      navigate(`/${input}/${folder.id}`, {
+        replace: true,
+      });
+    }
+    if (e.key === "Escape") {
+      setEdit(false);
+      setInput("");
+    }
+  };
+
   return (
     <>
       <div className="mb-[22px] flex flex-col flex-1 min-h-0">
@@ -72,31 +129,7 @@ export function SidebarFolders() {
               autoFocus
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={async (e) => {
-                if (e.key === "Enter" && input.trim()) {
-                  if (
-                    folders.some(
-                      (folder) =>
-                        folder.name.toLowerCase().trim() ===
-                        input.toLowerCase().trim(),
-                    )
-                  ) {
-                    toast.success(
-                      "this folder already exist, give another name",
-                    );
-                    return;
-                  }
-                  await createFolders(input);
-                  toast.success("Folder created successfulyy! Wohooo!!");
-                  setInput("");
-                  setShowInput(false);
-                  await loadFolders();
-                  const data = await fetchFolders();
-                  navigate(`/${data[0].name}/${data[0].id}`);
-                }
-
-                if (e.key === "Escape") setShowInput(false);
-              }}
+              onKeyDown={handleCreateFolder}
               className="flex-1 px-3 py-2 rounded-md bg-[var(--bg-input)] text-[var(--text-white)] text-sm outline-none"
               placeholder="New folder name"
             />
@@ -159,36 +192,7 @@ export function SidebarFolders() {
                         autoFocus
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={async (e) => {
-                          if (e.key === "Enter") {
-                            if (!input.trim()) return;
-                            if (
-                              folders.some(
-                                (f) =>
-                                  f.name.toLowerCase().trim() ===
-                                    input.toLowerCase().trim() &&
-                                  f.id !== folder.id,
-                              )
-                            ) {
-                              toast.error("Folder already exists");
-                              return;
-                            }
-
-                            await editFolder(folder.id, input);
-                            setEdit(false);
-                            await loadFolders();
-                            toast.success(
-                              "FolderName Edited Successfulyy! So Nicee!!",
-                            );
-                            navigate(`/${input}/${folder.id}`, {
-                              replace: true,
-                            });
-                          }
-                          if (e.key === "Escape") {
-                            setEdit(false);
-                            setInput("");
-                          }
-                        }}
+                        onKeyDown={(e) => handleEditingFolder(e, folder)}
                         onBlur={() => setEdit(false)}
                         onClick={(e) => e.stopPropagation()}
                         className="bg-[var(--bg-input)] px-2 py-1 rounded-md text-[var(--text-white)] text-sm outline-none w-full"

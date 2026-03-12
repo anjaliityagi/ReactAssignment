@@ -14,8 +14,8 @@ type Filter = "favorites" | "trash" | "archive";
 
 type NotesContextType = {
   notes: Notes[];
-  searchQuery: string;
-  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  // searchQuery: string;
+  // setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
   loadNotes: (
     cancel: () => boolean,
     filter?: Filter,
@@ -35,7 +35,7 @@ const NotesContext = createContext<NotesContextType | null>(null);
 
 export function NotesProvider({ children }: { children: React.ReactNode }) {
   const [notes, setNotes] = useState<Notes[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
   const [listLoading, setListLoading] = useState(false);
   const [recentNotes, setRecentNotes] = useState<RecentNotes[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,8 +89,8 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
     <NotesContext.Provider
       value={{
         notes,
-        searchQuery,
-        setSearchQuery,
+        // searchQuery,
+        // setSearchQuery,
         loadNotes,
         listLoading,
         setNotes,

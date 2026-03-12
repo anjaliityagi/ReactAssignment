@@ -1,7 +1,7 @@
 import { useNotes } from "../../context/NotesContext";
 import { useState, useRef } from "react";
 import { createNote, searchNote, type Notes } from "../../api";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Plus, Search, Sun, Moon } from "lucide-react";
 import { Logo } from "./Logo";
 import toast from "react-hot-toast";
@@ -15,13 +15,15 @@ export function SidebarHeader({ theme, toggleTheme }: SidebarHeaderProps) {
   const [result, setResult] = useState<Notes[]>([]);
   const navigate = useNavigate();
   const timerRef = useRef<number | null>(null);
+
+  const [searchParams, setSearchParams] = useSearchParams();
   const { folderName, folderId, filters } = useParams<{
     folderName: string;
     folderId: string;
     filters: "trash" | "archive" | "favorites";
   }>();
-
-  const { searchQuery, setSearchQuery, loadNotes } = useNotes();
+  const searchQuery = searchParams.get("search") || "";
+  const { loadNotes } = useNotes();
 
   const handleCreateNote = async () => {
     if (filters) return;
@@ -35,7 +37,15 @@ export function SidebarHeader({ theme, toggleTheme }: SidebarHeaderProps) {
   };
 
   const searchingNotes = (value: string) => {
-    setSearchQuery(value);
+    setSearchParams((prev) => {
+      if (value.trim()) {
+        prev.set("search", value);
+      } else {
+        prev.delete("search");
+      }
+
+      return prev;
+    });
 
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -136,7 +146,7 @@ export function SidebarHeader({ theme, toggleTheme }: SidebarHeaderProps) {
                     key={note.id}
                     onMouseDown={() => {
                       setShowResult(false);
-                      setSearchQuery("");
+                      setSearchParams({});
                       navigate(
                         `/${note.folder.name}/${note.folderId}/notes/${note.id}`,
                       );

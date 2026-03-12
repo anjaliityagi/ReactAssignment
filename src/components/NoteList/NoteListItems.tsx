@@ -110,7 +110,9 @@ export function NotesListItems() {
           notes.map((note) => {
             const isActive = location.pathname.includes(note.id);
 
-            const base = filter ? `/${filter}` : `/${folderName}/${folderId}`;
+            const base = folderName
+              ? `/${encodeURIComponent(folderName)}/${folderId}`
+              : `/${filter}`;
 
             return (
               <div

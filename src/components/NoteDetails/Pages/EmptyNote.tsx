@@ -15,7 +15,7 @@ export function EmptyNote() {
         <p className="text-sm text-[var(--text-gray-400)] leading-relaxed">
           Choose a note from the list on the left to view its contents, or
           create a new note to add to your
-          collection.jhbdjhbsejkgfbjksehrbgfkjsehbfgkvjgdbhfjvbskdjfvbkj
+          collection.jhbdjhbsejkgfbjksehrbgfkjsehbfgkvjgdbhfjvbskdjfvbkj,hvmhfdbfdsgfg
         </p>
       </div>
     </div>

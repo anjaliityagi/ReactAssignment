@@ -63,22 +63,27 @@ export function SidebarFolders() {
             folder.name.toLowerCase().trim() === input.toLowerCase().trim(),
         )
       ) {
-        toast.success("this folder already exist, give another name");
+        toast.success("this folder already exist,give another name");
         return;
       }
-      await createFolders(input);
-      toast.success("Folder created successfulyy! Wohooo!!");
-      setInput("");
-      setShowInput(false);
-      await loadFolders();
-      const data = await fetchFolders();
-      navigate(`/${data[0].name}/${data[0].id}`);
+      try {
+        await createFolders(input);
+        toast.success("Folder created successfulyy! Wohooo!!");
+        setInput("");
+        setShowInput(false);
+        await loadFolders();
+        const data = await fetchFolders();
+        navigate(`/${data[0].name}/${data[0].id}`);
+      } catch {
+        toast.error("Folder coudn't be created,please retry...");
+      }
     }
 
     if (e.key === "Escape") {
       setShowInput(false);
     }
   };
+
   const handleEditingFolder = async (
     e: React.KeyboardEvent<HTMLInputElement>,
     folder: Folder,
@@ -95,14 +100,17 @@ export function SidebarFolders() {
         toast.error("Folder already exists");
         return;
       }
-
-      await editFolder(folder.id, input);
-      setEdit(false);
-      await loadFolders();
-      toast.success("FolderName Edited Successfulyy! So Nicee!!");
-      navigate(`/${input}/${folder.id}`, {
-        replace: true,
-      });
+      try {
+        await editFolder(folder.id, input);
+        setEdit(false);
+        await loadFolders();
+        toast.success("FolderName Edited Successfulyy! So Nicee!!");
+        navigate(`/${input}/${folder.id}`, {
+          replace: true,
+        });
+      } catch {
+        toast.error("Folder couldn't be edited, retry...");
+      }
     }
     if (e.key === "Escape") {
       setEdit(false);

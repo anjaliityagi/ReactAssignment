@@ -26,12 +26,17 @@ export function SidebarHeader({ theme, toggleTheme }: SidebarHeaderProps) {
   const handleCreateNote = async () => {
     if (filters) return;
     if (!folderId) return;
+    try {
+      const newNote = await createNote(folderId, "", "", false, false);
 
-    const newNote = await createNote(folderId, "", "", false, false);
-
-    await loadNotes(() => false, undefined, folderId);
-    navigate(`/${folderName}/${folderId}/notes/${newNote}`);
-    toast.success("Note created successfulyy!Yayyyyy!!");
+      await loadNotes(() => false, undefined, folderId);
+      navigate(`/${folderName}/${folderId}/notes/${newNote}`);
+      toast.success("Note created successfulyy!Yayyyyy!!");
+    } catch {
+      toast.error(
+        "Note couldn't be created.. please retry with good internet connection...",
+      );
+    }
   };
 
   const searchingNotes = (value: string) => {
@@ -42,13 +47,17 @@ export function SidebarHeader({ theme, toggleTheme }: SidebarHeaderProps) {
     }
 
     timerRef.current = window.setTimeout(async () => {
-      if (value.trim()) {
-        const data = await searchNote(value);
-        setResult(data);
-        setShowResult(true);
-      } else {
-        setResult([]);
-        setShowResult(false);
+      try {
+        if (value.trim()) {
+          const data = await searchNote(value);
+          setResult(data);
+          setShowResult(true);
+        } else {
+          setResult([]);
+          setShowResult(false);
+        }
+      } catch {
+        toast.error("Network Errror! ");
       }
     }, 400);
   };

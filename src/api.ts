@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const { VITE_API_URL } = import.meta.env;
+
 const api = axios.create({
-  baseURL: "https://nowted-server.remotestate.com",
+  baseURL: VITE_API_URL,
 });
 export interface Folder {
   id: string;

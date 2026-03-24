@@ -70,36 +70,45 @@ export function NoteView() {
     loadFolders();
   }, []);
 
-  const autoSave = (title: string, content: string) => {
+  const autoSave = async (title: string, content: string) => {
     if (!noteId) return;
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
+    setSaving(true);
+    try {
+      timeoutRef.current = window.setTimeout(async () => {
+        await updateNote(noteId, { title, content });
 
-    timeoutRef.current = window.setTimeout(async () => {
-      setSaving(true);
+        setSaved(true);
+        loadRecents();
+        setTimeout(() => setSaved(false), 3000);
 
-      await updateNote(noteId, { title, content });
-
+        setNotes((prev) =>
+          prev.map((n) =>
+            n.id === noteId
+              ? {
+                  ...n,
+                  title,
+                  preview: content.slice(0, 50),
+                  updatedAt: new Date().toDateString(),
+                }
+              : n,
+          ),
+        );
+      }, 1000);
+    } catch (error) {
+      toast.error("Note not saved..retrying");
+      try {
+        await updateNote(noteId, { title, content });
+      } catch {
+        toast.error("Network error, please try again");
+        console.log(error);
+      }
+    } finally {
       setSaving(false);
-      setSaved(true);
-      loadRecents();
-      setTimeout(() => setSaved(false), 3000);
-
-      setNotes((prev) =>
-        prev.map((n) =>
-          n.id === noteId
-            ? {
-                ...n,
-                title,
-                preview: content.slice(0, 50),
-                updatedAt: new Date().toDateString(),
-              }
-            : n,
-        ),
-      );
-    }, 1000);
+    }
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,6 +120,7 @@ export function NoteView() {
     setContent(e.target.value);
     autoSave(title, e.target.value);
   };
+
   const handleDelete = async () => {
     if (!noteId || !note) return;
 
@@ -118,18 +128,21 @@ export function NoteView() {
       setConfirmDelete(true);
       return;
     }
+    try {
+      await deleteNote(noteId);
+      toast.success("Note deleted!!");
+      setConfirmDelete(false);
+      await loadNotes(() => false, filter, folderId);
 
-    await deleteNote(noteId);
-    toast.success("Note deleted!!");
-    setConfirmDelete(false);
-    await loadNotes(() => false, filter, folderId);
-
-    navigate(
-      filter
-        ? `/${filter}/notes/${noteId}/restore`
-        : `/${note.folder.name}/${note.folder.id}/notes/${note.id}/restore`,
-      { state: { title: note.title } },
-    );
+      navigate(
+        filter
+          ? `/${filter}/notes/${noteId}/restore`
+          : `/${note.folder.name}/${note.folder.id}/notes/${note.id}/restore`,
+        { state: { title: note.title } },
+      );
+    } catch {
+      toast.error("Note not deleted!!, retry with good network connection!");
+    }
   };
 
   const toggleFavorite = async () => {
@@ -137,15 +150,20 @@ export function NoteView() {
 
     const wasFavorite = note.isFavorite;
     setMenuOpen(false);
-    await updateNote(noteId, { isFavorite: !note.isFavorite });
-    await loadNotes(() => false, filter, folderId);
 
-    setNote((prev) =>
-      prev ? { ...prev, isFavorite: !prev.isFavorite } : prev,
-    );
+    try {
+      await updateNote(noteId, { isFavorite: !note.isFavorite });
+      await loadNotes(() => false, filter, folderId);
 
-    if (filter === "favorites" && wasFavorite) {
-      navigate("/favorites");
+      setNote((prev) =>
+        prev ? { ...prev, isFavorite: !prev.isFavorite } : prev,
+      );
+
+      if (filter === "favorites" && wasFavorite) {
+        navigate("/favorites");
+      }
+    } catch {
+      toast.error("Something went wrong!");
     }
   };
 
@@ -154,21 +172,26 @@ export function NoteView() {
 
     const wasArchived = note.isArchived;
     setMenuOpen(false);
-    await updateNote(noteId, { isArchived: !note.isArchived });
-    await loadNotes(() => false, filter, folderId);
 
-    setNote((prev) =>
-      prev ? { ...prev, isArchived: !prev.isArchived } : prev,
-    );
+    try {
+      await updateNote(noteId, { isArchived: !note.isArchived });
+      await loadNotes(() => false, filter, folderId);
 
-    if (filter) {
-      navigate(`/${filter}`);
-    } else {
-      navigate(`/${note.folder.name}/${note.folderId}`);
-    }
+      setNote((prev) =>
+        prev ? { ...prev, isArchived: !prev.isArchived } : prev,
+      );
 
-    if (filter === "archive" && wasArchived) {
-      navigate("/archive");
+      if (filter) {
+        navigate(`/${filter}`);
+      } else {
+        navigate(`/${note.folder.name}/${note.folderId}`);
+      }
+
+      if (filter === "archive" && wasArchived) {
+        navigate("/archive");
+      }
+    } catch {
+      toast.error("Something went wrong!");
     }
   };
 

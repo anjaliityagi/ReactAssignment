@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { NotesProvider } from "./context/NotesContext";
@@ -39,9 +38,7 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <NotesProvider>
-      <RouterProvider router={router} />
-    </NotesProvider>
-  </React.StrictMode>,
+  <NotesProvider>
+    <RouterProvider router={router} />
+  </NotesProvider>,
 );

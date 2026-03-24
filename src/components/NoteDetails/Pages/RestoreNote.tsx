@@ -20,24 +20,29 @@ export function RestoreNote() {
   const handleRestore = async () => {
     if (!noteId) return;
     setLoading(true);
-    await restoreNote(noteId);
-    await loadNotes(() => false, filter, folderId);
-    const updatedNote = await fetchNoteById(noteId);
 
-    setLoading(false);
+    try {
+      await restoreNote(noteId);
+      await loadNotes(() => false, filter, folderId);
+      const updatedNote = await fetchNoteById(noteId);
 
-    if (filter === "favorites" || filter === "archive") {
-      navigate(`/${filter}/notes/${updatedNote.id}`);
-    } else if (filter === "trash") {
-      navigate(
-        `/${updatedNote.folder.name}/${updatedNote.folder.id}/notes/${updatedNote.id}`,
-      );
-    } else {
-      navigate(
-        `/${updatedNote.folder.name}/${updatedNote.folder.id}/notes/${updatedNote.id}`,
-      );
+      if (filter === "favorites" || filter === "archive") {
+        navigate(`/${filter}/notes/${updatedNote.id}`);
+      } else if (filter === "trash") {
+        navigate(
+          `/${updatedNote.folder.name}/${updatedNote.folder.id}/notes/${updatedNote.id}`,
+        );
+      } else {
+        navigate(
+          `/${updatedNote.folder.name}/${updatedNote.folder.id}/notes/${updatedNote.id}`,
+        );
+      }
+      toast.success("Note restored successfulyy!!hurrayy!");
+    } catch {
+      toast.error("Note couldn't be restored!! Please retry...");
+    } finally {
+      setLoading(false);
     }
-    toast.success("Note restored successfulyy!!hurrayy!");
   };
 
   return (
